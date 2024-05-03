@@ -1,4 +1,7 @@
-import nbtlib
+# import nbtlib
+from nbtlib_net import load
+
+
 from numpy import array, argwhere , int32, maximum, minimum, zeros, count_nonzero, flip
 import json
 loaded={}
@@ -11,6 +14,7 @@ def embed( small_array, big_array, loc):
     ystop=ystart+small_array.shape[1]
     zstop=zstart+small_array.shape[2]
     big_array[xstart:xstop,ystart:ystop,zstart:zstop]=small_array
+
 class process_structure:
     def __init__(self, file):
         global loaded
@@ -19,12 +23,16 @@ class process_structure:
             
         with open("lookups/material_list_names.json") as nbt_file:
             self.block_names=json.load(nbt_file)
+
         if type(file) is dict:
             self.NBTfile = file
         else:
-            self.NBTfile = nbtlib.load(file, byteorder='little')
+            self.NBTfile = load(file, byteorder='little')
         loaded=self.NBTfile
         
+        # for i in self.NBTfile.keys():
+        #     print("key: ",i)
+
         if "" in self.NBTfile.keys():
             self.NBTfile=self.NBTfile[""]
 
@@ -32,6 +40,9 @@ class process_structure:
         self.size = list(map(int, self.NBTfile["size"]))
         self.palette = self.NBTfile["structure"]["palette"]["default"]["block_palette"]
         self.mins = array(list(map(int,self.NBTfile["structure_world_origin"])))
+        print('$$$')
+        # print(self.NBTfile)
+        # print(list(map(int,self.NBTfile["structure_world_origin"])))
         self.maxs = self.mins + array(self.size)-1
         self.origin = array(list(map(int,self.NBTfile["structure_world_origin"])))
         self.get_blockmap()
@@ -97,7 +108,7 @@ class combined_structures:
         
         for file in file_list:
             self.structs[file] = {}
-            self.structs[file]["nbt"] = nbtlib.load(file, byteorder='little')
+            self.structs[file]["nbt"] = load(file, byteorder='little')
             if "" in self.structs[file]["nbt"].keys():
                 self.structs[file]["nbt"] = self.NBTfile[""]
             

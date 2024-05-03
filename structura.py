@@ -1,3 +1,4 @@
+# GUI
 import os
 import updater
 if not(os.path.exists("lookups")):
