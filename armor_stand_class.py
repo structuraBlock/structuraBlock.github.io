@@ -1,7 +1,4 @@
 import json
-from PIL import Image
-import numpy as np
-import copy
 import os
 
 

@@ -4,13 +4,96 @@ except:
     print("using built in json, but that is much slower, consider installing ujson")
     import json
 from PIL import Image
-from numpy import array, ones, uint8, zeros
+# from numpy import array # , uint8 , zeros , ones
 import copy
 import os
 import time
 
 debug=False
 
+def multiply_alpha(image_array, alpha):
+    """
+    调整多维列表（模拟图像数组）中每个元素最后一个通道的值，乘以alpha。
+    image_array: 多维列表，模拟图像数据
+    alpha: 乘以的系数
+    """
+    for i, layer in enumerate(image_array):
+        for j, row in enumerate(layer):
+            if len(row) > 3:  # 确保有至少四个通道
+                image_array[i][j][-1] *= alpha  # 仅调整最后一个通道
+    return image_array
+
+
+def assign_to_multidim_list(target, source, start_indices, shapes):
+    """
+    将source的数据按start_indices和shapes指定的范围赋值到target多维列表中。
+    target: 目标多维列表
+    source: 源数据，多维列表
+    start_indices: 一个包含各维度起始索引的列表
+    shapes: 一个包含各维度长度的列表，对应source的形状
+    """
+    # 基础情况：如果到达最后一维，则直接赋值
+    if len(start_indices) == 1:
+        for i in range(shapes[0]):
+            target[start_indices[0] + i] = source[i]
+    else:
+        # 递归情况：处理更高维度
+        for i in range(shapes[0]):
+            assign_to_multidim_list(
+                target[start_indices[0] + i], 
+                source[i], 
+                start_indices[1:], 
+                shapes[1:]
+            )
+
+def list_shape(lst):
+    if isinstance(lst, list):
+        if not lst:  # 空列表
+            return []
+        shapes = [list_shape(item) for item in lst]
+        if all(len(shape) == len(shapes[0]) for shape in shapes):  # 所有子列表的维度相同
+            return [len(lst),] + shapes[0]
+        else:  # 不规则的多维列表
+            return [len(lst)] + shapes
+    else:
+        return [1,]
+
+ 
+
+def image_to_list(img):
+        width, height = img.size
+        image_list = []
+        for row in range(height):
+            row_list = []
+            for col in range(width):
+                pixel = img.getpixel((col, row))
+                if img.mode == 'RGB':
+                    row_list.append(list(pixel[:3]))  # 将元组转换为列表  # 如果是RGB模式，只取前三个值
+                else:
+                    row_list.append(list(pixel))
+            image_list.append(row_list)
+        return image_list
+
+
+def 多维列表生成器(shape,nomo=0):
+    # in english -> multidimensional_list_generator
+    shape.reverse()
+    # 假设shape是一个列表，以每位数字为创建的多维列表的长度
+    # 逆序遍历shape
+    Olist = nomo
+    for l in shape:
+        print(l)
+        Olist = [Olist]*l
+    return Olist
+
+
+def ones(shape):
+    return 多维列表生成器(shape,1)
+
+
+
+def zeros(shape):
+    return 多维列表生成器(shape,0)
 
 class armorstandgeo:
     def __init__(self, name, alpha = 0.8,offsets=[0,0,0], size=[64, 64, 64], ref_pack="Vanilla_Resource_Pack"):
@@ -265,26 +348,32 @@ class armorstandgeo:
     def extend_uv_image(self, new_image_filename):
         # helper function that just appends to the uv array to make things
         image = Image.open(new_image_filename)
-        impt = array(image)
-        shape=list(impt.shape)
+        impt = image_to_list(image)
+        shape=list(list_shape(impt))
         if shape[0]>16:
             shape[0]=16
             impt=impt[0:16,:,:]
         if shape[1]>16:
             shape[1]=16
             impt=impt[:,0:16,:]
-        image_array = ones([16, 16, 4],uint8)*255
-        image_array[0:shape[0], 0:shape[1], 0:impt.shape[2]] = impt
-        image_array[:, :, 3] = image_array[:, :, 3] * self.alpha
+        image_array = 多维列表生成器([16, 16, 4],255)
+        # print("\n\n\n\n\n\n\n",impt,image_array,[0,0,0],shape)
+        assign_to_multidim_list(impt,image_array,[0,0,0],shape)
+        # image_array[0:shape[0], 0:shape[1], 0:impt.shape[2]] = impt
+        # image_array[0:shape[0], 0:shape[1], 0:shape[2]] = impt
+        # image_array[:, :, 3] = image_array[:, :, 3] * self.alpha
+        multiply_alpha(image_array,self.alpha)
         if type(self.uv_array) is type(None):
             self.uv_array = image_array
         else:
-            startshape = list(self.uv_array.shape)
+            startshape = list(list_shape(self.uv_array))
             endshape = startshape.copy()
-            endshape[0] += image_array.shape[0]
-            temp_new = zeros(endshape, uint8)
-            temp_new[0:startshape[0], :, :] = self.uv_array
-            temp_new[startshape[0]:, :, :] = image_array
+            endshape[0] += list_shape(image_array)[0]
+            temp_new = zeros(endshape)
+            assign_to_multidim_list(temp_new,self.uv_array,[0,0,0],list_shape(self.uv_array))
+            assign_to_multidim_list(temp_new,image_array,[startshape[0],0,0],list_shape(self.uv_array))
+            # temp_new[0:startshape[0], :, :] = self.uv_array
+            # temp_new[startshape[0]:, :, :] = image_array
             self.uv_array = temp_new
 
     def block_name_to_uv(self, block_name, variant = "",shape_variant="default",index=0,data=0):

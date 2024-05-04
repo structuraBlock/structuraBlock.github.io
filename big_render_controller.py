@@ -4,8 +4,6 @@ except:
     print("using built in json, but that is much slower, consider installing ujson")
     import json
 import os
-import copy
-import numpy as np
 
 class render_controller:
     def __init__(self):
