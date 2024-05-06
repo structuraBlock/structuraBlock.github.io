@@ -173,12 +173,12 @@ if __name__ == "__main__":
     batchtest.append(testFileName)
     testFileName="test_structures\\All Blocks World\\Stones.mcstructure"
     batchtest.append(testFileName)
-##    test=combined_structures(batchtest,excludedBlocks)
+    ##    test=combined_structures(batchtest,excludedBlocks)
     
     test=process_structure(testFileName)
     bllist=test.get_block_list(ignored_blocks=excludedBlocks)
-##    for key,value in bllist.items():
-##        print(f"{key}:{value}")
+    ##    for key,value in bllist.items():
+    ##        print(f"{key}:{value}")
     for x in range(test.size[0]):
         for z in range(test.size[2]):
             block=test.get_block(x,0,z)

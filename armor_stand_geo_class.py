@@ -315,6 +315,7 @@ class armorstandgeo:
             self.uv_array = image_array
         else:
             startshape = list(self.uv_array.shape)
+            startshape = list(self.uv_array.shape)
             endshape = startshape.copy()
             endshape[0] += image_array.shape[0]
             temp_new = tnp.zeros(tuple(endshape),'uint8')

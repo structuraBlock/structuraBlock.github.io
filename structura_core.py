@@ -2,13 +2,14 @@
 import io
 import armor_stand_geo_class as asgc
 import armor_stand_class ,structure_reader ,animation_class ,manifest ,os ,json ,shutil 
+import armor_stand_class ,structure_reader ,animation_class ,manifest ,os ,json ,shutil 
 import render_controller_class as rcc
 import big_render_controller as brc
 from shutil import copyfile
 import time
 import os
 
-from js import document, Blob, window, document, Uint8Array, File, URL
+from js import document, document, Uint8Array, File, URL
 
 debug=False
 
@@ -242,7 +243,9 @@ class structura:
                 data = int(block["states"][key])
             if key == "rail_direction" and key in block["states"].keys():
                 data = str(block["states"][key].as_unsigned)
+                data = str(block["states"][key].as_unsigned)
                 if "rail_data_bit" in block["states"].keys():
+                    data += "-"+str(block["states"]["rail_data_bit"].as_unsigned)
                     data += "-"+str(block["states"]["rail_data_bit"].as_unsigned)
 
         if "wood_type" in block["states"].keys():
