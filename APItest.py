@@ -13,8 +13,7 @@ files_to_conver={
         "decor":{"file":"test_structures/All Blocks World/decorative.mcstructure",
                  "offset":[-32,0,-31]},
         "wood2":{"file":"test_structures/All Blocks World/wood2.mcstructure",
-                 "offset":[-32,0,-31]}
-                 }
+                 "offset":[-32,0,-31]}}
 try:
     shutil.rmtree("tmp/")
 except:
@@ -23,10 +22,8 @@ if os.path.exists("tmp/all_blocks.mcpack"):
     os.remove("tmp/all_blocks.mcpack")
 if os.path.exists("tmp/all_blocks Nametags.txt"):
     os.remove("tmp/all_blocks Nametags.txt")
-
 structura_base=structura_core.structura("tmp/all_blocks")
 structura_base.set_opacity(20)
-
 
 for name_tag, info in files_to_conver.items():
     print(f'{name_tag}, {info}')

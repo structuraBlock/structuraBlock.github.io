@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+
+    "target": "es2022",         
+    "module": "ES2022",             
+    "esModuleInterop": true,     
+    "forceConsistentCasingInFileNames": true,        
+    "strict": true,       
+    
+    "moduleResolution": "node", // 使用Node.js的模块解析策略
+ 
+    
+  },
+  
+  // 包含或排除某些文件或目录
+  "include": [
+    "*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

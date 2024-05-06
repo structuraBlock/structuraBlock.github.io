@@ -1,4 +1,3 @@
-# GUI
 import os
 import updater
 if not(os.path.exists("lookups")):
@@ -7,10 +6,11 @@ if not(os.path.exists("lookups")):
     
 import json
 from structura_core import structura
+from turtle import color
 from numpy import array, int32, minimum
 import nbtlib
 
-from tkinter import filedialog,messagebox
+from tkinter import ttk,filedialog,messagebox
 from tkinter import StringVar, Button, Label, Entry, Tk, Checkbutton, END, ACTIVE
 from tkinter import filedialog, Scale,DoubleVar,HORIZONTAL,IntVar,Listbox, ANCHOR
 debug = False

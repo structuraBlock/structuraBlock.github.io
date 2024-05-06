@@ -1,21 +1,15 @@
 {
-  "name": "structura",
-  "version": "1.0.0",
-  "description": "[![Github All Releases](https://img.shields.io/github/downloads/RavinMaddHatter/Structura/total.svg)]()",
-  "main": "APItest.js",
-  "directories": {
-    "doc": "docs"
-  },
-  "scripts": {
-    "test": "node APItest.js"
-  },
   "type": "module",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "devDependencies": {
+    "@types/archiver": "^6.0.2",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.12.8",
+    "@types/uuid": "^9.0.8"
+  },
   "dependencies": {
-    "express": "^4.19.2",
-    "multer": "^1.4.5-lts.1",
-    "nbtify": "^1.90.1"
+    "archiver": "^7.0.1",
+    "fs-extra": "^11.2.0",
+    "nbtify": "^1.90.1",
+    "uuid": "^9.0.1"
   }
 }

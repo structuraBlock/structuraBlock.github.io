@@ -1,25 +1,11 @@
-import shutil
+
+import armor_stand_geo_class as asgc
+import armor_stand_class ,structure_reader ,animation_class ,manifest ,os ,json ,shutil 
+import render_controller_class as rcc
+import big_render_controller as brc
 from shutil import copyfile
 import time
-import os, json  
-
-# 清单文件生成
-import manifest 
-# 储存盔甲架的资源包实体文件的数据驱动信息，以及负责创建对应定制化JSON文件
-import armor_stand_class 
-# 储存盔甲架的模型信息，以及使用数学运算库进行处理，同时对包含全部纹理的问立即图像进行信息获取和处理
-import armor_stand_geo_class as asgc
-
-# 结构文件解析和数学库
-import structure_reader 
-# 储存和生成动画JSON文件
-import animation_class 
-# 渲染控制器
-import render_controller_class as rcc
-# 渲染控制器
-import big_render_controller as brc
-
-
+import os
 
 debug=False
 
@@ -218,9 +204,9 @@ class structura:
             if nbt_def[key]== "data" and key in block["states"].keys():
                 data = int(block["states"][key])
             if key == "rail_direction" and key in block["states"].keys():
-                data = str(block["states"][key])
+                data = str(block["states"][key].as_unsigned)
                 if "rail_data_bit" in block["states"].keys():
-                    data += "-"+str(block["states"]["rail_data_bit"])
+                    data += "-"+str(block["states"]["rail_data_bit"].as_unsigned)
 
         if "wood_type" in block["states"].keys():
             variant = ["wood_type",block["states"]["wood_type"]]
