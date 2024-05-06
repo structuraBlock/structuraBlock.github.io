@@ -1,8 +1,4 @@
-try:
-    import ujson as json
-except:
-    print("using built in json, but that is much slower, consider installing ujson")
-    import json
+import json
 import os
 
 class render_controller:

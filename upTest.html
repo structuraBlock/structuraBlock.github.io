@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PyScript Offline</title>
+  <script type="module" src="/pyscript/core.js"></script>
+  <link rel="stylesheet" href="/pyscript/core.css">
+
+</head>
+<body>
+  
+  <label for="Upload a File"></label>
+  <input type="file" id="file-upload">
+
+    <py-script>
+      from js import document, window, Uint8Array
+      from pyodide.ffi.wrappers import add_event_listener
+
+      async def upload_file_and_show(e):
+          file_list = e.target.files
+          first_item = file_list.item(0)
+
+          my_bytes: bytes = await get_bytes_from_file(first_item)
+          print(my_bytes[:10]) # Do something with file contents
+
+      async def get_bytes_from_file(file):
+          array_buf = await file.arrayBuffer()
+          return array_buf.to_bytes()
+
+      add_event_listener(document.getElementById("file-upload"), "change", upload_file_and_show)
+    </py-script>
+</body>
+</html>

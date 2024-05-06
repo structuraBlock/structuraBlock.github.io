@@ -1,65 +1,13 @@
-try:
-    import ujson as json
-except:
-    print("using built in json, but that is much slower, consider installing ujson")
-    import json
-from PIL import Image
-# from numpy import array # , uint8 , zeros , ones
+import json
+# from PIL import Image
+import png
+# from numpy import array, ones, uint8, zeros
+import tinynumpy as tnp
 import copy
 import os
 import time
 
 debug=False
-
-def multiply_alpha(image_array, alpha):
-    """
-    调整多维列表（模拟图像数组）中每个元素最后一个通道的值，乘以alpha。
-    image_array: 多维列表，模拟图像数据
-    alpha: 乘以的系数
-    """
-    for i, layer in enumerate(image_array):
-        for j, row in enumerate(layer):
-            if len(row) > 3:  # 确保有至少四个通道
-                image_array[i][j][-1] *= alpha  # 仅调整最后一个通道
-    return image_array
-
-
-def assign_to_multidim_list(target, source, start_indices, shapes):
-    """
-    将source的数据按start_indices和shapes指定的范围赋值到target多维列表中。
-    target: 目标多维列表
-    source: 源数据，多维列表
-    start_indices: 一个包含各维度起始索引的列表
-    shapes: 一个包含各维度长度的列表，对应source的形状
-    """
-    # 基础情况：如果到达最后一维，则直接赋值
-    if len(start_indices) == 1:
-        for i in range(shapes[0]):
-            target[start_indices[0] + i] = source[i]
-    else:
-        # 递归情况：处理更高维度
-        for i in range(shapes[0]):
-            assign_to_multidim_list(
-                target[start_indices[0] + i], 
-                source[i], 
-                start_indices[1:], 
-                shapes[1:]
-            )
-
-def list_shape(lst):
-    if isinstance(lst, list):
-        if not lst:  # 空列表
-            return []
-        shapes = [list_shape(item) for item in lst]
-        if all(len(shape) == len(shapes[0]) for shape in shapes):  # 所有子列表的维度相同
-            return [len(lst),] + shapes[0]
-        else:  # 不规则的多维列表
-            return [len(lst)] + shapes
-    else:
-        return [1,]
-
- 
-
 def image_to_list(img):
         width, height = img.size
         image_list = []
@@ -73,27 +21,6 @@ def image_to_list(img):
                     row_list.append(list(pixel))
             image_list.append(row_list)
         return image_list
-
-
-def 多维列表生成器(shape,nomo=0):
-    # in english -> multidimensional_list_generator
-    shape.reverse()
-    # 假设shape是一个列表，以每位数字为创建的多维列表的长度
-    # 逆序遍历shape
-    Olist = nomo
-    for l in shape:
-        print(l)
-        Olist = [Olist]*l
-    return Olist
-
-
-def ones(shape):
-    return 多维列表生成器(shape,1)
-
-
-
-def zeros(shape):
-    return 多维列表生成器(shape,0)
 
 class armorstandgeo:
     def __init__(self, name, alpha = 0.8,offsets=[0,0,0], size=[64, 64, 64], ref_pack="Vanilla_Resource_Pack"):
@@ -324,7 +251,18 @@ class armorstandgeo:
         if self.uv_array is None:
             print("No Blocks Were found")
         else:
-            im = Image.fromarray(self.uv_array)
+            # for i in range(1616):
+                # print(self.uv_array[i])
+            python_list = []
+            # 遍历三维数组的前两维
+            for layer in self.uv_array:
+                # 对每一层，将后两维展平
+                flattened_row = [element for row in layer for element in row]
+                python_list.append(flattened_row)
+
+
+            print("self.uv_array" , len(python_list[0]))
+            im = png.from_array(python_list,"RGBA",)
             im.save(name)
 
     def stand_init(self):
@@ -347,33 +285,42 @@ class armorstandgeo:
 
     def extend_uv_image(self, new_image_filename):
         # helper function that just appends to the uv array to make things
-        image = Image.open(new_image_filename)
-        impt = image_to_list(image)
-        shape=list(list_shape(impt))
+        with open(new_image_filename, 'rb') as file:
+            reader = png.Reader(file)
+            f = reader.read_flat()
+            image_flat_rgba = tnp.array(f[2],'uint8').transpose()
+            # print(new_image_filename,'f[3]["planes"]',f[3]["planes"],len(image_flat_rgba)//16//f[3]["planes"])
+            impt = image_flat_rgba.reshape([len(image_flat_rgba)//16//f[3]["planes"],16,f[3]["planes"]])
+            # print(image_flat_rgba.reshape([16,16*f[3]["planes"]]))
+            # python_2d_list = []
+            # for row in image_flat_rgba.reshape([16,16*f[3]["planes"]]):
+            #     python_2d_list.append(list(row))
+            # print(python_2d_list,"\n\n\n\n\n")
+            # print("num_pixels",num_pixels,new_image_filename,f[3]["planes"])
+            # num_pixels = len(image_flat_rgba) // f[3]["planes"]
+            # impt =  image_rgba_array # tnp.array(image_rgba_array,'uint8')
+        # print("#",impt[8],"a")
+        shape=list(impt.shape)
+        # print("shape",shape)
         if shape[0]>16:
             shape[0]=16
             impt=impt[0:16,:,:]
         if shape[1]>16:
             shape[1]=16
             impt=impt[:,0:16,:]
-        image_array = 多维列表生成器([16, 16, 4],255)
-        # print("\n\n\n\n\n\n\n",impt,image_array,[0,0,0],shape)
-        assign_to_multidim_list(impt,image_array,[0,0,0],shape)
-        # image_array[0:shape[0], 0:shape[1], 0:impt.shape[2]] = impt
-        # image_array[0:shape[0], 0:shape[1], 0:shape[2]] = impt
-        # image_array[:, :, 3] = image_array[:, :, 3] * self.alpha
-        multiply_alpha(image_array,self.alpha)
+        image_array = tnp.zeros((16, 16, 4) ,'uint8')
+        image_array[0:shape[0], 0:shape[1], 0:impt.shape[2]] = impt
+        image_array[:, :, 3] = image_array[:, :, 3] # * self.alpha
         if type(self.uv_array) is type(None):
             self.uv_array = image_array
         else:
-            startshape = list(list_shape(self.uv_array))
+            startshape = list(self.uv_array.shape)
             endshape = startshape.copy()
-            endshape[0] += list_shape(image_array)[0]
-            temp_new = zeros(endshape)
-            assign_to_multidim_list(temp_new,self.uv_array,[0,0,0],list_shape(self.uv_array))
-            assign_to_multidim_list(temp_new,image_array,[startshape[0],0,0],list_shape(self.uv_array))
-            # temp_new[0:startshape[0], :, :] = self.uv_array
-            # temp_new[startshape[0]:, :, :] = image_array
+            endshape[0] += image_array.shape[0]
+            temp_new = tnp.zeros(tuple(endshape),'uint8')
+            # print("temp_new[0:startshape[0], :, :] = self.uv_array",self.uv_array[0])
+            temp_new[0:startshape[0], :, :] = self.uv_array
+            temp_new[startshape[0]:, :, :] = image_array
             self.uv_array = temp_new
 
     def block_name_to_uv(self, block_name, variant = "",shape_variant="default",index=0,data=0):
@@ -463,3 +410,6 @@ class armorstandgeo:
 
             
         return textures
+
+
+            # im = png.from_array([[40,40,40,255,31,31,31,255,17,17,17,255,144,144,144,255,146,146,146,255,144,144,144,255,146,146,146,255,156,156,156,255,149,149,149,255,144,144,144,255,146,146,146,255,149,149,149,255,146,146,146,255,48,48,48,255,38,38,38,255,41,41,41,255],[34,34,34,255,19,19,19,255,21,21,21,255,107,107,107,255,108,108,108,255,110,110,110,255,108,108,108,255,112,112,112,255,122,122,122,255,119,119,119,255,119,119,119,255,118,118,118,255,117,117,117,255,44,44,44,255,44,44,44,255,42,42,42,255],[18,18,18,255,16,16,16,255,147,147,147,255,137,137,137,255,128,128,128,255,137,137,137,255,137,137,137,255,128,128,128,255,147,147,147,255,128,128,128,255,128,128,128,255,147,147,147,255,128,128,128,255,109,109,109,255,44,44,44,255,36,36,36,255],[152,152,152,255,117,117,117,255,137,137,137,255,106,106,106,255,106,106,106,255,113,113,113,255,106,106,106,255,106,106,106,255,113,113,113,255,113,113,113,255,106,106,106,255,113,113,113,255,113,113,113,255,73,73,73,255,170,170,170,255,154,154,154,255],[156,156,156,255,118,118,118,255,128,128,128,255,122,122,122,255,113,113,113,255,106,106,106,255,122,122,122,255,113,113,113,255,106,106,106,255,106,106,106,255,106,106,106,255,106,106,106,255,106,106,106,255,84,84,84,255,164,164,164,255,144,144,144,255],[146,146,146,255,122,122,122,255,147,147,147,255,106,106,106,255,113,113,113,255,106,106,106,255,113,113,113,255,106,106,106,255,122,122,122,255,113,113,113,255,113,113,113,255,106,106,106,255,122,122,122,255,78,78,78,255,164,164,164,255,152,152,152,255],[149,149,149,255,120,120,120,255,137,137,137,255,106,106,106,255,106,106,106,255,122,122,122,255,106,106,106,255,122,122,122,255,106,106,106,255,113,113,113,255,113,113,113,255,113,113,113,255,106,106,106,255,73,73,73,255,158,158,158,255,149,149,149,255],[149,149,149,255,120,120,120,255,128,128,128,255,122,122,122,255,122,122,122,255,113,113,113,255,106,106,106,255,113,113,113,255,113,113,113,255,106,106,106,255,106,106,106,255,106,106,106,255,122,122,122,255,77,77,77,255,154,154,154,255,149,149,149,255],[149,149,149,255,110,110,110,255,128,128,128,255,113,113,113,255,113,113,113,255,106,106,106,255,122,122,122,255,113,113,113,255,113,113,113,255,113,113,113,255,106,106,106,255,122,122,122,255,113,113,113,255,73,73,73,255,154,154,154,255,149,149,149,255],[149,149,149,255,108,108,108,255,137,137,137,255,106,106,106,255,106,106,106,255,122,122,122,255,106,106,106,255,106,106,106,255,113,113,113,255,106,106,106,255,122,122,122,255,106,106,106,255,113,113,113,255,73,73,73,255,155,155,155,255,149,149,149,255],[159,159,159,255,107,107,107,255,137,137,137,255,113,113,113,255,106,106,106,255,113,113,113,255,113,113,113,255,113,113,113,255,106,106,106,255,122,122,122,255,113,113,113,255,106,106,106,255,113,113,113,255,73,73,73,255,170,170,170,255,149,149,149,255],[146,146,146,255,107,107,107,255,128,128,128,255,113,113,113,255,106,106,106,255,113,113,113,255,113,113,113,255,106,106,106,255,106,106,106,255,113,113,113,255,106,106,106,255,122,122,122,255,106,106,106,255,77,77,77,255,170,170,170,255,142,142,142,255],[151,151,151,255,107,107,107,255,137,137,137,255,106,106,106,255,122,122,122,255,106,106,106,255,106,106,106,255,122,122,122,255,113,113,113,255,106,106,106,255,106,106,106,255,113,113,113,255,113,113,113,255,73,73,73,255,170,170,170,255,141,141,141,255],[54,54,54,255,48,48,48,255,109,109,109,255,73,73,73,255,77,77,77,255,77,77,77,255,77,77,77,255,73,73,73,255,77,77,77,255,73,73,73,255,77,77,77,255,73,73,73,255,77,77,77,255,73,73,73,255,74,74,74,255,77,77,77,255],[40,40,40,255,44,44,44,255,44,44,44,255,170,170,170,255,170,170,170,255,171,171,171,255,167,167,167,255,175,175,175,255,167,167,167,255,162,162,162,255,170,170,170,255,170,170,170,255,170,170,170,255,62,62,62,255,62,62,62,255,55,55,55,255],[38,38,38,255,40,40,40,255,31,31,31,255,149,149,149,255,152,152,152,255,152,152,152,255,152,152,152,255,152,152,152,255,156,156,156,255,142,142,142,255,142,142,142,255,142,142,142,255,142,142,142,255,58,58,58,255,48,48,48,255,41,41,41,255]],"RGBA",)
