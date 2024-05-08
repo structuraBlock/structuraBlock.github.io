@@ -1,14 +1,13 @@
 
 import io
+import shutil
 import zipfile
-from shutil import copyfile
 import time
 import os
-
+import json 
 
 import armor_stand_geo_class as asgc
-import armor_stand_class ,structure_reader ,animation_class ,manifest ,os ,json ,shutil 
-import armor_stand_class ,structure_reader ,animation_class ,manifest ,os ,json ,shutil 
+import armor_stand_class ,structure_reader ,animation_class ,manifest 
 import render_controller_class as rcc
 import big_render_controller as brc
 
@@ -97,7 +96,7 @@ class structura:
             self.rc.add_model(model_name)
             self.armorstand_entity.add_model(model_name)
             ## temp folder would be a good idea
-            copyfile(self.structure_files[model_name]["file"], "{}/{}.mcstructure".format(self.pack_name,model_name))
+            shutil.copyfile(self.structure_files[model_name]["file"], "{}/{}.mcstructure".format(self.pack_name,model_name))
             if debug:
                 print(self.structure_files[model_name]['offsets'])
             struct2make = structure_reader.process_structure(self.structure_files[model_name]["file"])
@@ -193,18 +192,12 @@ class structura:
             manifest.export(self.pack_name,nameTags=nametags)
         else:
             manifest.export(self.pack_name)
-        copyfile(self.icon, f"{self.pack_name}/pack_icon.png")
+        shutil.copyfile(self.icon, f"{self.pack_name}/pack_icon.png")
         larger_render = "lookups/armor_stand.larger_render.geo.json"
         larger_render_path = f"{self.pack_name}/models/entity/armor_stand.larger_render.geo.json"
-        copyfile(larger_render, larger_render_path)
+        shutil.copyfile(larger_render, larger_render_path)
         self.rc.export(self.pack_name)
         
-        # shutil.make_archive("{}".format(self.pack_name), 'zip', self.pack_name)
-        # os.rename(f'{self.pack_name}.zip',f'{self.pack_name}.mcpack')
-        
-        
-
-        # shutil.rmtree(self.pack_name)
         # 遍历这个目录
         file_paths = []
         for root, dirs, files in os.walk('temp'):
@@ -213,6 +206,7 @@ class structura:
         print("file_paths",file_paths)
 
         mcpack = prepare_compressed_data_for_js(self.pack_name)
+        shutil.rmtree(self.pack_name)
         
         js_array = Uint8Array.new(len(mcpack))
         js_array.assign(mcpack)
