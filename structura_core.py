@@ -1,17 +1,38 @@
 
 import io
+import zipfile
+from shutil import copyfile
+import time
+import os
+
+
 import armor_stand_geo_class as asgc
 import armor_stand_class ,structure_reader ,animation_class ,manifest ,os ,json ,shutil 
 import armor_stand_class ,structure_reader ,animation_class ,manifest ,os ,json ,shutil 
 import render_controller_class as rcc
 import big_render_controller as brc
-from shutil import copyfile
-import time
-import os
 
 from js import document, document, Uint8Array, File, URL
 
 debug=False
+
+def prepare_compressed_data_for_js(directory_path: str) -> bytes:
+    """
+    压缩指定目录及其内容，并直接返回适合用于构造JavaScript Uint8Array的字节数据。
+    
+    :param directory_path: 需要压缩的目录路径
+    :return: 适合构造Uint8Array的压缩后字节数据
+    """
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
+        for root, _, files in os.walk(directory_path):
+            for file in files:
+                full_path = os.path.join(root, file)
+                archive_path = os.path.relpath(full_path, directory_path)
+                with open(full_path, 'rb') as f:
+                    zf.writestr(archive_path, f.read())
+    return zip_buffer.getvalue()
+
 
 with open("lookups/nbt_defs.json") as f:
     nbt_def = json.load(f)
@@ -177,43 +198,31 @@ class structura:
         larger_render_path = f"{self.pack_name}/models/entity/armor_stand.larger_render.geo.json"
         copyfile(larger_render, larger_render_path)
         self.rc.export(self.pack_name)
-        file_paths = []
-        shutil.make_archive("{}".format(self.pack_name), 'zip', self.pack_name)
-        os.rename(f'{self.pack_name}.zip',f'{self.pack_name}.mcpack')
         
-        shutil.rmtree(self.pack_name)
+        # shutil.make_archive("{}".format(self.pack_name), 'zip', self.pack_name)
+        # os.rename(f'{self.pack_name}.zip',f'{self.pack_name}.mcpack')
+        
+        
+
+        # shutil.rmtree(self.pack_name)
         # 遍历这个目录
+        file_paths = []
         for root, dirs, files in os.walk('temp'):
             for file in files:
                 file_paths.append(os.path.join(root, file))
         print("file_paths",file_paths)
 
-
-        with open(f'{self.pack_name}.mcpack', 'rb') as mcpack:
-            mcpack = mcpack.read() # .hex()
+        mcpack = prepare_compressed_data_for_js(self.pack_name)
+        
+        js_array = Uint8Array.new(len(mcpack))
+        js_array.assign(mcpack)
             
-            my_stream = io.BytesIO(mcpack)
-            js_array = Uint8Array.new(len(mcpack))
-            js_array.assign(my_stream.getbuffer())
-            
-            file = File.new([js_array], "unused_file_name.zip")
-            url = URL.createObjectURL(file)
+        file = File.new([js_array], "unused_file_name.zip")
+        url = URL.createObjectURL(file)
                     
-        # mcpack = Buffer.alloc(11)
         document.getElementById("download-div").innerHTML = "i am ready"
         document.getElementById("downloadButton").innerHTML = url
         document.getElementById("downloadButton").style.display = "block"
-        # blob = Blob.new([mcpack], {type: ""})
-
-        # downloadDoc = document.createElement('a')
-        # downloadDoc.abc = url #window.URL.createObjectURL(blob)
-
-
-        # downloadButton = document.createElement('button')
-        # downloadButton.innerHTML = url
-            
-        # downloadDoc.appendChild(downloadButton)
-        # document.getElementById("download-div").appendChild(downloadDoc)
 
         print("Pack Making Completed")
         self.timers["finished"]=time.time()-self.timers["previous"]

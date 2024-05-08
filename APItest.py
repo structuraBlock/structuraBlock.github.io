@@ -5,14 +5,14 @@ structura_core.debug=True
 
 files_to_conver={
         
-        "gems":{"file":"test_structures/All Blocks World/gems and redstone.mcstructure",
-                "offset":[-32,0,-32]},
-        "stone":{"file":"test_structures/All Blocks World/Stones.mcstructure",
-                 "offset":[-30,0,-32]},
-        "wood":{"file":"test_structures/All Blocks World/wood.mcstructure",
-                "offset":[-31,0,-31]},
-        "decor":{"file":"test_structures/All Blocks World/decorative.mcstructure",
-                 "offset":[-32,0,-31]},
+        # "gems":{"file":"test_structures/All Blocks World/gems and redstone.mcstructure",
+        #         "offset":[-32,0,-32]},
+        # "stone":{"file":"test_structures/All Blocks World/Stones.mcstructure",
+        #          "offset":[-30,0,-32]},
+        # "wood":{"file":"test_structures/All Blocks World/wood.mcstructure",
+                # "offset":[-31,0,-31]},
+        # "decor":{"file":"test_structures/All Blocks World/decorative.mcstructure",
+        #          "offset":[-32,0,-31]},
         "wood2":{"file":"test_structures/All Blocks World/wood2.mcstructure",
                  "offset":[-32,0,-31]}}
 try:
@@ -36,3 +36,6 @@ structura_base.generate_with_nametags()
 print(structura_base.compile_pack())
 print(structura_base.make_nametag_block_lists())
 
+print("Done!!")
+print("Done!!")
+print("完成啦！！")

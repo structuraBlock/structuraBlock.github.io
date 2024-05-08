@@ -74,7 +74,6 @@ packages = [ "certifi==2022.12.7","cffi==1.15.1","charset-normalizer==3.0.1","id
 "test_structures/All Blocks World/Stones.mcstructure" = "./test_structures/All Blocks World/Stones.mcstructure"
 "test_structures/All Blocks World/wood.mcstructure" = "./test_structures/All Blocks World/wood.mcstructure"
 "test_structures/All Blocks World/wood2.mcstructure" = "./test_structures/All Blocks World/wood2.mcstructure"
-"test_structures/All_Blocks_World/04.png" = "./test_structures/All_Blocks_World/04.png"
 "tinylinalg.py" = "./tinylinalg.py"
 "tinynumpy.py" = "./tinynumpy.py"
 "updater.py" = "./updater.py"
