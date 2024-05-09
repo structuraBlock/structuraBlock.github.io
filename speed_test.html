@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PyScript Offline</title>
+  <script type="module" src="/pyscript/core.js"></script>
+  <link rel="stylesheet" href="/pyscript/core.css">
+
+
+<script>
+  function downloadFile() {
+    const now = new Date();
+ 
+
+      const button = document.getElementById('downloadButton');
+      const url = button.innerHTML;
+      const mimeType = 'application/octet-stream'; // 你可以根据需要替换
+      const fileName = now.toString()+'火魄构建.mcpack'; // 你可以根据需要替换
+
+      // 创建并触发下载
+      downloadBlobFromUrl(url, mimeType, fileName);
+  }
+
+  // 从URL下载Blob并指定MIME类型和文件名的函数
+  function downloadBlobFromUrl(url, mimeType, fileName) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+
+      // 创建一个Blob对象，指定MIME类型
+      fetch(url)
+          .then(response => response.blob())
+          .then(blob => {
+              link.href = URL.createObjectURL(blob);
+              link.type = mimeType;
+          })
+          .finally(() => {
+              // 触发下载
+              const event = new MouseEvent('click', { bubbles: true, cancelable: true, view: window });
+              link.dispatchEvent(event);
+
+              // 清理
+              setTimeout(() => {
+                  URL.revokeObjectURL(link.href);
+              }, 0);
+          });
+  }
+</script>
+</head>
+<body>
+  <div>如果能点击，请点击下裁</div>
+  <div>click for download</div>
+<button id="downloadButton" onclick="downloadFile()" style="display: none;">#</button>
+
+ 
+
+  <!-- <script type="mpy">
+    from pyscript import document
+
+    document.body.append("Hello from PyScript")
+  </script> -->
+ 
+    <div id="id_name">wait</div>
+    <div id="download-div">wait and wait</div>
+    <script type="py" src="./speed_test.py" config="./pyscript.toml" terminal></script>
+
+    <!-- <py-script>
+      from js import document
+      def toRed(  ):
+        document.getElementById("id_name").innerHTML = "red"
+    </py-script> -->
+</body>
+</html>
