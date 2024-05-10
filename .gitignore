@@ -1,3 +1,7 @@
+#pyscript
+python_modules
+list.txt
+
 #node
 node_modules
 
@@ -6,8 +10,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
-*.so
 
 # Distribution / packaging
 .Python
