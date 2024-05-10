@@ -19,7 +19,7 @@ class process_structure:
             
         with open("lookups/material_list_names.json") as nbt_file:
             self.block_names=json.load(nbt_file)
-        if type(file) is dict:
+        if type(file) is dict or type(file) is nbtlib.nbt.File:
             self.NBTfile = file
         else:
             self.NBTfile = nbtlib.load(file, byteorder='little')

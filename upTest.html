@@ -3,26 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PyScript Offline</title>
+  <title>选择结构文件并生成投影的测试</title>
   <script type="module" src="/pyscript/core.js"></script>
   <link rel="stylesheet" href="/pyscript/core.css">
-
+  <script>
+    function downloadFile() {
+      const now = new Date();
+   
+  
+        const button = document.getElementById('downloadButton');
+        const url = button.innerHTML;
+        const mimeType = 'application/octet-stream'; // 你可以根据需要替换
+        const fileName = now.toString()+'火魄构建.mcpack'; // 你可以根据需要替换
+  
+        // 创建并触发下载
+        downloadBlobFromUrl(url, mimeType, fileName);
+    }
+  
+    // 从URL下载Blob并指定MIME类型和文件名的函数
+    function downloadBlobFromUrl(url, mimeType, fileName) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+  
+        // 创建一个Blob对象，指定MIME类型
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                link.href = URL.createObjectURL(blob);
+                link.type = mimeType;
+            })
+            .finally(() => {
+                // 触发下载
+                const event = new MouseEvent('click', { bubbles: true, cancelable: true, view: window });
+                link.dispatchEvent(event);
+  
+                // 清理
+                setTimeout(() => {
+                    URL.revokeObjectURL(link.href);
+                }, 0);
+            });
+    }
+  </script>
 </head>
 <body>
   
   <label for="Upload a File"></label>
   <input type="file" id="file-upload">
 
+
+  <div>如果能点击，请点击下裁</div>
+  <div>click for download</div>
+  <button id="downloadButton" onclick="downloadFile()" style="display: none;">#</button>
+
+
+    <div id="id_name">wait</div>
+    <div id="download-div">wait and wait</div>
+  
+
+
+
+  <script type="py" src="./upTest.py" config="./pyscript.toml" terminal></script>
+
     <py-script>
+      from io import BytesIO
       from js import document, window, Uint8Array
       from pyodide.ffi.wrappers import add_event_listener
+      
+      from upTest import conver
 
+      
       async def upload_file_and_show(e):
           file_list = e.target.files
           first_item = file_list.item(0)
 
           my_bytes: bytes = await get_bytes_from_file(first_item)
-          print(my_bytes[:10]) # Do something with file contents
+          file_buffer = BytesIO(my_bytes)
+          print("now!!!")
+          conver("yh",file_buffer)
+          # print(my_bytes[:10]) # Do something with file contents
 
       async def get_bytes_from_file(file):
           array_buf = await file.arrayBuffer()

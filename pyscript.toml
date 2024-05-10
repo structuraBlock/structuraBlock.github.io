@@ -2,6 +2,7 @@ name = "Holy Surf"
 packages = [ "certifi==2022.12.7","cffi==1.15.1","charset-normalizer==3.0.1","idna==3.4","nbtlib==2.0.4","packaging==23.1","platformdirs==3.0.0","pooch==1.7.0","pycparser==2.21","PyNaCl==1.5.0","requests==2.28.2","pypng","urllib3==1.26.14" ]
 
 [files]
+"upTest.py" = "./upTest.py"
 "animation_class.py" = "./animation_class.py"
 "APItest.py" = "./APItest.py"
 "armor_stand_class.py" = "./armor_stand_class.py"
@@ -28,7 +29,6 @@ packages = [ "certifi==2022.12.7","cffi==1.15.1","charset-normalizer==3.0.1","id
 "lookups/pack_icon.afphoto" = "./lookups/pack_icon.afphoto"
 "lookups/pack_icon.png" = "./lookups/pack_icon.png"
 "lookups/variants.json" = "./lookups/variants.json"
-"test_structures/All Blocks World/All Blocks.mcworld" = "./test_structures/All Blocks World/All Blocks.mcworld"
 "test_structures/All Blocks World/decorative.mcstructure" = "./test_structures/All Blocks World/decorative.mcstructure"
 "test_structures/All Blocks World/gems and redstone.mcstructure" = "./test_structures/All Blocks World/gems and redstone.mcstructure"
 "test_structures/All Blocks World/Stones.mcstructure" = "./test_structures/All Blocks World/Stones.mcstructure"

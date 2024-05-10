@@ -97,7 +97,8 @@ class structura:
             self.rc.add_model(model_name)
             self.armorstand_entity.add_model(model_name)
             ## temp folder would be a good idea
-            shutil.copyfile(self.structure_files[model_name]["file"], "{}/{}.mcstructure".format(self.pack_name,model_name))
+            # shutil.copyfile(self.structure_files[model_name]["file"], "{}/{}.mcstructure".format(self.pack_name,model_name))
+            print(type(self.structure_files[model_name]["file"]))
             if debug:
                 print(self.structure_files[model_name]['offsets'])
             struct2make = structure_reader.process_structure(self.structure_files[model_name]["file"])
