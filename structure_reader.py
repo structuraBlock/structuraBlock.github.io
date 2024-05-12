@@ -1,4 +1,5 @@
 import nbtlib
+# numpy-1.26.4-cp311-cp311-emscripten_3_1_46_wasm32.whl -- > 12MB ???? what?
 from numpy import array, argwhere , int32, maximum, minimum, zeros, count_nonzero, flip
 import json
 loaded={}
