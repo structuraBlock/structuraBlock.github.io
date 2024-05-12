@@ -1,8 +1,8 @@
+
 name = "Holy Surf"
 packages = [ "certifi==2022.12.7","cffi==1.15.1","charset-normalizer==3.0.1","idna==3.4","nbtlib==2.0.4","packaging==23.1","platformdirs==3.0.0","pooch==1.7.0","pycparser==2.21","PyNaCl==1.5.0","requests==2.28.2","pypng","urllib3==1.26.14" ]
 
 [files]
-"upTest.py" = "./upTest.py"
 "animation_class.py" = "./animation_class.py"
 "APItest.py" = "./APItest.py"
 "armor_stand_class.py" = "./armor_stand_class.py"
@@ -13,11 +13,11 @@ packages = [ "certifi==2022.12.7","cffi==1.15.1","charset-normalizer==3.0.1","id
 "merge_terrain_texture.py" = "./merge_terrain_texture.py"
 "pack_icon.ico" = "./pack_icon.ico"
 "render_controller_class.py" = "./render_controller_class.py"
+"speed_test.html" = "./speed_test.html"
 "speed_test.py" = "./speed_test.py"
 "structura_core.py" = "./structura_core.py"
 "structure_reader.py" = "./structure_reader.py"
-"tinylinalg.py" = "./tinylinalg.py"
-"tinynumpy.py" = "./tinynumpy.py"
+"upTest.py" = "./upTest.py"
 "lookups/armor_stand.larger_render.geo.json" = "./lookups/armor_stand.larger_render.geo.json"
 "lookups/block_definition.json" = "./lookups/block_definition.json"
 "lookups/block_rotation.json" = "./lookups/block_rotation.json"
@@ -1172,3 +1172,5 @@ packages = [ "certifi==2022.12.7","cffi==1.15.1","charset-normalizer==3.0.1","id
 "Vanilla_Resource_Pack/textures/merge_terrain_texture.py" = "./Vanilla_Resource_Pack/textures/merge_terrain_texture.py"
 "Vanilla_Resource_Pack/textures/terrain_texture.json" = "./Vanilla_Resource_Pack/textures/terrain_texture.json"
 "Vanilla_Resource_Pack/variants.json" = "./Vanilla_Resource_Pack/variants.json"
+"python_modules/tinynumpy/tinylinalg.py" = "./python_modules/tinynumpy/tinylinalg.py"
+"python_modules/tinynumpy/tinynumpy.py" = "./python_modules/tinynumpy/tinynumpy.py"

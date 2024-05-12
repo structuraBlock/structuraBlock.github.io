@@ -7,7 +7,7 @@ import time
 # from PIL import Image
 import png
 # from numpy import array, ones, uint8, zeros
-import tinynumpy as tnp
+import python_modules.tinynumpy as tnp
 
 debug=False
 def image_to_list(img):
