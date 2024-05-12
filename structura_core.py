@@ -36,6 +36,7 @@ def prepare_compressed_data_for_js(directory_path: str) -> bytes:
 
 with open("lookups/nbt_defs.json") as f:
     nbt_def = json.load(f)
+    
 class structura:
     def __init__(self,pack_name):
         os.makedirs(pack_name)
@@ -130,7 +131,7 @@ class structura:
                 
                 text_file.write("{}: {}\n".format(commonName,self.all_blocks[name]))
 
-    def _add_blocks_to_geo(self,struct2make,model_name,export_big=False):
+    def _add_blocks_to_geo(self,struct2make:structure_reader.combined_structures,model_name:str,export_big=False):
         [xlen, ylen, zlen] = struct2make.get_size()
         if export_big:
             self.structure_files[model_name]['offsets'][0]-=xlen.item()+7

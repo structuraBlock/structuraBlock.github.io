@@ -1,7 +1,7 @@
 import nbtlib
 # numpy-1.26.4-cp311-cp311-emscripten_3_1_46_wasm32.whl -- > 12MB ???? what?
 from numpy import array, argwhere , int32, maximum, minimum, zeros, count_nonzero, flip
-# import python_modules.tinynumpy as tnp
+import python_modules.tinynumpy.tinynumpy as tnp
 import json
 loaded={}
 def embed( small_array, big_array, loc):
@@ -34,7 +34,7 @@ class process_structure:
         self.size = list(map(int, self.NBTfile["size"]))
         self.palette = self.NBTfile["structure"]["palette"]["default"]["block_palette"]
         self.mins = array(list(map(int,self.NBTfile["structure_world_origin"])))
-        self.maxs = self.mins + array(self.size)-1
+        # self.maxs = self.mins + array(self.size)-1 # nono
         self.origin = array(list(map(int,self.NBTfile["structure_world_origin"])))
         self.get_blockmap()
     def get_layer_blocks(self,y):
