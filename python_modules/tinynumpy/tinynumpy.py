@@ -97,367 +97,6 @@ for d in _known_dtypes:
 newaxis = None
 
 
-def _convert_dtype(dtype, to='numpy'):
-    """ Convert dtype, if could not find, pass as it was.
-    """
-    if dtype is None:
-        return dtype
-    dtype = str(dtype)
-    index = {'array':0, 'short':1, 'numpy':2, 'ctypes':3}[to]
-    for dd in _dtypes:
-        if dtype in dd:
-            return dd[index]
-    return dtype  # Otherwise return original
-
-
-def _ceildiv(a, b):
-    return -(-a // b)
-
-
-def _get_step(view):
-    """ Return step to walk over array. If 1, the array is fully
-    C-contiguous. If 0, the striding is such that one cannot
-    step through the array.
-    """
-    cont_strides = _strides_for_shape(view.shape, view.itemsize)
-    
-    step = view.strides[-1] // cont_strides[-1]
-    corrected_strides = tuple([i * step for i in cont_strides])
-    
-    almost_cont = view.strides == corrected_strides
-    if almost_cont:
-        return step
-    else:
-        return 0  # not contiguous
-
-
-def _strides_for_shape(shape, itemsize):
-    strides = []
-    stride_product = 1
-    for s in reversed(shape):
-        strides.append(stride_product)
-        stride_product *= s
-    return tuple([i * itemsize for i in reversed(strides)])
-
-
-def _size_for_shape(shape):
-    stride_product = 1
-    for s in shape:
-        stride_product *= s
-    return stride_product
-
-
-def squeeze_strides(s):
-    """ Pop strides for singular dimensions. """
-    return tuple([s[0]] + [s[i] for i in range(1, len(s)) if s[i] != s[i-1]])
-
-
-def _shape_from_object(obj):
-    
-    shape = []
-    # todo: make more efficient, use len() etc
-    def _shape_from_object_r(index, element, axis):
-        try:
-            for i, e in enumerate(element):
-                _shape_from_object_r(i, e, axis+1)
-            while len(shape) <= axis:
-                shape.append(0)
-            l = i + 1
-            s = shape[axis]
-            if l > s:
-                shape[axis] = l
-        except TypeError:
-            pass
-
-    _shape_from_object_r(0, obj, 0)
-    return tuple(shape)
-
-
-def _assign_from_object(array, obj):
-    key = []
-    # todo: make more efficient, especially the try-except
-    def _assign_from_object_r(element):
-        try:
-            for i, e in enumerate(element):
-                key.append(i)
-                _assign_from_object_r(e)
-                key.pop()
-        except TypeError:
-            array[tuple(key)] = element
-
-    _assign_from_object_r(obj)
-
-
-def _increment_mutable_key(key, shape):
-    for axis in reversed(xrange(len(shape))):
-        key[axis] += 1
-        if key[axis] < shape[axis]:
-            return True
-        if axis == 0:
-            return False
-        key[axis] = 0
-
-
-def _key_for_index(index, shape):
-    key = []
-    cumshape = [1]
-    for i in reversed(shape):
-        cumshape.insert(0, cumshape[0] * i)
-    for s in cumshape[1:-1]:
-        n = index // s
-        key.append(n)
-        index -= n * s
-    key.append(index)
-    return tuple(key)
-
-
-def _zerositer(n):
-    for i in xrange(n):
-        yield 0
-
-
-
-## Public functions
-
-
-def array(obj, dtype=None, copy=True, order=None):
-    """ array(obj, dtype=None, copy=True, order=None)
-    
-    Create a new array. If obj is an ndarray, and copy=False, a view
-    of that array is returned. For details see:
-    http://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html
-    """
-    dtype = _convert_dtype(dtype)
-    
-    if isinstance(obj, ndarray):
-        # From existing array
-        a = obj.view()
-        if dtype is not None and dtype != a.dtype:
-            a = a.astype(dtype)
-        elif copy:
-            a = a.copy()
-        return a
-    if hasattr(obj, '__array_interface__'):
-        # From something that looks like an array, we can create
-        # the ctypes array for this and use that as a buffer
-        D = obj.__array_interface__
-        # Get dtype
-        dtype_orig = _convert_dtype(D['typestr'][1:])
-        # Create array
-        if D['strides']:
-            itemsize = int(D['typestr'][-1])
-            bufsize = D['strides'][0] * D['shape'][0] // itemsize
-        else:
-            bufsize = _size_for_shape(D['shape'])
-        
-        BufType = (_convert_dtype(dtype_orig, 'ctypes') * bufsize)
-        buffer = BufType.from_address(D['data'][0])
-        a = ndarray(D['shape'], dtype_orig,
-                    buffer=buffer, strides=D['strides'], order=order)
-        # Convert or copy?
-        if dtype is not None and dtype != dtype_orig:
-            a = a.astype(dtype)
-        elif copy:
-            a = a.copy()
-        return a
-    else:
-        # From some kind of iterable
-        shape = _shape_from_object(obj)
-        # Try to derive dtype
-        if dtype is None:
-            el = obj
-            while isinstance(el, (tuple, list)) and el:
-                el = el[0]
-            if isinstance(el, int):
-                dtype = 'int64'
-        # Create array
-        a = ndarray(shape, dtype, order=None)
-        _assign_from_object(a, obj)
-        return a
-
-
-def zeros_like(a, dtype=None, order=None):
-    """ Return an array of zeros with the same shape and type as a given array.
-    """
-    dtype = a.dtype if dtype is None else dtype
-    return zeros(a.shape, dtype, order)
-
-
-def ones_like(a, dtype=None, order=None):
-    """ Return an array of ones with the same shape and type as a given array.
-    """
-    dtype = a.dtype if dtype is None else dtype
-    return ones(a.shape, dtype, order)
-
-
-def empty_like(a, dtype=None, order=None):
-    """ Return a new array with the same shape and type as a given array.
-    """
-    dtype = a.dtype if dtype is None else dtype
-    return empty(a.shape, dtype, order)
-
-
-def zeros(shape, dtype=None, order=None):
-    """Return a new array of given shape and type, filled with zeros
-    """
-    return empty(shape, dtype, order)
-
-
-def ones(shape, dtype=None, order=None):
-    """Return a new array of given shape and type, filled with ones
-    """
-    a = empty(shape, dtype, order)
-    a.fill(1)
-    return a
-
-
-def eye(size):
-    """Return a new 2d array with given dimensions, filled with ones on the
-    diagonal and zeros elsewhere.
-    """
-    a = zeros((size,size))
-    for i in xrange(size):
-        a[i,i] = 1
-    return a
-
-
-def empty(shape, dtype=None, order=None):
-    """Return a new array of given shape and type, without initializing entries
-    """
-    return ndarray(shape, dtype, order=order)
-
-
-def arange(*args, **kwargs):
-    """ arange([start,] stop[, step,], dtype=None)
-
-    Return evenly spaced values within a given interval.
-    
-    Values are generated within the half-open interval ``[start, stop)``
-    (in other words, the interval including `start` but excluding `stop`).
-    For integer arguments the function is equivalent to the Python built-in
-    `range <http://docs.python.org/lib/built-in-funcs.html>`_ function,
-    but returns an ndarray rather than a list.
-
-    When using a non-integer step, such as 0.1, the results will often not
-    be consistent.  It is better to use ``linspace`` for these cases.
-    """
-    # Get dtype
-    dtype = kwargs.pop('dtype', None)
-    if kwargs:
-        x = list(kwargs.keys())[0]
-        raise TypeError('arange() got an unexpected keyword argument %r' % x)
-    # Parse start, stop, step
-    if len(args) == 0:
-        raise TypeError('Required argument "start" not found')
-    elif len(args) == 1:
-        start, stop, step = 0, int(args[0]), 1
-    elif len(args) == 2:
-        start, stop, step = int(args[0]), int(args[1]), 1
-    elif len(args) == 3:
-        start, stop, step = int(args[0]), int(args[1]), int(args[2])
-    else:
-        raise TypeError('Too many input arguments')
-    # Init
-    iter = xrange(start, stop, step)
-    a = empty((len(iter),), dtype=dtype)
-    a[:] = list(iter)
-    return a
-
-
-def linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None):
-    """ linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)
-    
-    Return evenly spaced numbers over a specified interval. Returns num
-    evenly spaced samples, calculated over the interval [start, stop].
-    The endpoint of the interval can optionally be excluded.
-    """
-    # Prepare
-    start, stop = float(start), float(stop)
-    ra = stop - start
-    if endpoint:
-        step = ra / (num-1)
-    else:
-        step = ra / num
-    # Create
-    a = empty((num,), dtype)
-    a[:] = [start + i * step for i in xrange(num)]
-    # Return
-    if retstep:
-        return a, step
-    else:
-        return a
-
-def add(ndarray_vec1, ndarray_vec2):
-    c = []
-    for a, b in zip(ndarray_vec1, ndarray_vec2):
-        c.append(a+b)
-    cRay = array(c)
-    return cRay
-
-def subtract(ndarray_vec1, ndarray_vec2):
-    c = []
-    for a, b in zip(ndarray_vec1, ndarray_vec2):
-        c.append(a-b)
-    cRay = array(c)
-    return cRay
-
-def multiply(ndarray_vec1, ndarray_vec2):
-    c = []
-    for a, b in zip(ndarray_vec1, ndarray_vec2):
-        c.append(a*b)
-    cRay = array(c)
-    return cRay
-
-def divide(ndarray_vec1, integer):
-    c = []
-    for a in ndarray_vec1:
-        c.append(a / integer)
-    cRay = array(c)
-    return cRay
-
-def cross(u, v):
-    """
-    Return the cross product of two 3 dimentional vectors.
-    """
-
-    uDim = len(u)
-    vDim = len(v)
-
-    uxv = []
-
-    # http://mathworld.wolfram.com/CrossProduct.html
-    if uDim == vDim == 3:
-        try:
-            for i in range(uDim):
-                uxv.append(0)
-                uxv = [u[1]*v[2]-u[2]*v[1], -(u[0]*v[2]-u[2]*v[0]),
-                       u[0]*v[1]-u[1]*v[0]]
-        except LinAlgError as e:
-            uxv = e
-    else:
-        raise IndexError('Vector has invalid dimensions')
-    return uxv
-
-def dot(u, v):
-    """
-    Return the dot product of two 3 dimentional vectors.
-    """
-
-    uDim = len(u)
-    vDim = len(v)
-
-    # http://reference.wolfram.com/language/ref/Dot.html
-    if uDim == vDim == 3:
-        try:
-            u_dot_v = sum(map(operator.mul, u, v))
-        except LinAlgError as e:
-            u_dot_v = e
-    else:
-        raise IndexError('Vector has invalid dimensions')
-    return u_dot_v
-
-## The class
-
 class ndarray(object):
     """ ndarray(shape, dtype='float64', buffer=None, offset=0,
                 strides=None, order=None)
@@ -762,8 +401,6 @@ class ndarray(object):
             out = empty(self.shape, 'bool')
             out[:] = [i1==i2 for (i1, i2) in zip(self.flat, other.flat)]
             return out
-    
-    ## Private helper functions
     
     def _index_helper(self, key):
         
@@ -1172,3 +809,480 @@ class nditer:
 
     def next(self):
         return self.__next__()
+
+
+def _convert_dtype(dtype, to='numpy'):
+    """ Convert dtype, if could not find, pass as it was.
+    """
+    if dtype is None:
+        return dtype
+    dtype = str(dtype)
+    index = {'array':0, 'short':1, 'numpy':2, 'ctypes':3}[to]
+    for dd in _dtypes:
+        if dtype in dd:
+            return dd[index]
+    return dtype  # Otherwise return original
+
+
+def _ceildiv(a, b):
+    return -(-a // b)
+
+
+def _get_step(view):
+    """ Return step to walk over array. If 1, the array is fully
+    C-contiguous. If 0, the striding is such that one cannot
+    step through the array.
+    """
+    cont_strides = _strides_for_shape(view.shape, view.itemsize)
+    
+    step = view.strides[-1] // cont_strides[-1]
+    corrected_strides = tuple([i * step for i in cont_strides])
+    
+    almost_cont = view.strides == corrected_strides
+    if almost_cont:
+        return step
+    else:
+        return 0  # not contiguous
+
+
+def _strides_for_shape(shape, itemsize):
+    strides = []
+    stride_product = 1
+    for s in reversed(shape):
+        strides.append(stride_product)
+        stride_product *= s
+    return tuple([i * itemsize for i in reversed(strides)])
+
+
+def _size_for_shape(shape):
+    stride_product = 1
+    for s in shape:
+        stride_product *= s
+    return stride_product
+
+
+def squeeze_strides(s):
+    """ Pop strides for singular dimensions. """
+    return tuple([s[0]] + [s[i] for i in range(1, len(s)) if s[i] != s[i-1]])
+
+
+def _shape_from_object(obj):
+    
+    shape = []
+    # todo: make more efficient, use len() etc
+    def _shape_from_object_r(index, element, axis):
+        try:
+            for i, e in enumerate(element):
+                _shape_from_object_r(i, e, axis+1)
+            while len(shape) <= axis:
+                shape.append(0)
+            l = i + 1
+            s = shape[axis]
+            if l > s:
+                shape[axis] = l
+        except TypeError:
+            pass
+
+    _shape_from_object_r(0, obj, 0)
+    return tuple(shape)
+
+
+def _assign_from_object(array, obj):
+    key = []
+    # todo: make more efficient, especially the try-except
+    def _assign_from_object_r(element):
+        try:
+            for i, e in enumerate(element):
+                key.append(i)
+                _assign_from_object_r(e)
+                key.pop()
+        except TypeError:
+            array[tuple(key)] = element
+
+    _assign_from_object_r(obj)
+
+
+def _increment_mutable_key(key, shape):
+    for axis in reversed(xrange(len(shape))):
+        key[axis] += 1
+        if key[axis] < shape[axis]:
+            return True
+        if axis == 0:
+            return False
+        key[axis] = 0
+
+
+def _key_for_index(index, shape):
+    key = []
+    cumshape = [1]
+    for i in reversed(shape):
+        cumshape.insert(0, cumshape[0] * i)
+    for s in cumshape[1:-1]:
+        n = index // s
+        key.append(n)
+        index -= n * s
+    key.append(index)
+    return tuple(key)
+
+
+def _zerositer(n):
+    for i in xrange(n):
+        yield 0
+
+
+
+## Public functions
+
+
+def array(obj, dtype=None, copy=True, order=None):
+    """ array(obj, dtype=None, copy=True, order=None)
+    
+    Create a new array. If obj is an ndarray, and copy=False, a view
+    of that array is returned. For details see:
+    http://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html
+    """
+    dtype = _convert_dtype(dtype)
+    
+    if isinstance(obj, ndarray):
+        # From existing array
+        a = obj.view()
+        if dtype is not None and dtype != a.dtype:
+            a = a.astype(dtype)
+        elif copy:
+            a = a.copy()
+        return a
+    if hasattr(obj, '__array_interface__'):
+        # From something that looks like an array, we can create
+        # the ctypes array for this and use that as a buffer
+        D = obj.__array_interface__
+        # Get dtype
+        dtype_orig = _convert_dtype(D['typestr'][1:])
+        # Create array
+        if D['strides']:
+            itemsize = int(D['typestr'][-1])
+            bufsize = D['strides'][0] * D['shape'][0] // itemsize
+        else:
+            bufsize = _size_for_shape(D['shape'])
+        
+        BufType = (_convert_dtype(dtype_orig, 'ctypes') * bufsize)
+        buffer = BufType.from_address(D['data'][0])
+        a = ndarray(D['shape'], dtype_orig,
+                    buffer=buffer, strides=D['strides'], order=order)
+        # Convert or copy?
+        if dtype is not None and dtype != dtype_orig:
+            a = a.astype(dtype)
+        elif copy:
+            a = a.copy()
+        return a
+    else:
+        # From some kind of iterable
+        shape = _shape_from_object(obj)
+        # Try to derive dtype
+        if dtype is None:
+            el = obj
+            while isinstance(el, (tuple, list)) and el:
+                el = el[0]
+            if isinstance(el, int):
+                dtype = 'int64'
+        # Create array
+        a = ndarray(shape, dtype, order=None)
+        _assign_from_object(a, obj)
+        return a
+
+
+def zeros_like(a, dtype=None, order=None):
+    """ Return an array of zeros with the same shape and type as a given array.
+    """
+    dtype = a.dtype if dtype is None else dtype
+    return zeros(a.shape, dtype, order)
+
+
+def ones_like(a, dtype=None, order=None):
+    """ Return an array of ones with the same shape and type as a given array.
+    """
+    dtype = a.dtype if dtype is None else dtype
+    return ones(a.shape, dtype, order)
+
+
+def empty_like(a, dtype=None, order=None):
+    """ Return a new array with the same shape and type as a given array.
+    """
+    dtype = a.dtype if dtype is None else dtype
+    return empty(a.shape, dtype, order)
+
+
+def zeros(shape, dtype=None, order=None):
+    """Return a new array of given shape and type, filled with zeros
+    """
+    return empty(shape, dtype, order)
+
+
+def ones(shape, dtype=None, order=None):
+    """Return a new array of given shape and type, filled with ones
+    """
+    a = empty(shape, dtype, order)
+    a.fill(1)
+    return a
+
+
+def eye(size):
+    """Return a new 2d array with given dimensions, filled with ones on the
+    diagonal and zeros elsewhere.
+    """
+    a = zeros((size,size))
+    for i in xrange(size):
+        a[i,i] = 1
+    return a
+
+
+def empty(shape, dtype=None, order=None):
+    """Return a new array of given shape and type, without initializing entries
+    """
+    return ndarray(shape, dtype, order=order)
+
+
+def arange(*args, **kwargs):
+    """ arange([start,] stop[, step,], dtype=None)
+
+    Return evenly spaced values within a given interval.
+    
+    Values are generated within the half-open interval ``[start, stop)``
+    (in other words, the interval including `start` but excluding `stop`).
+    For integer arguments the function is equivalent to the Python built-in
+    `range <http://docs.python.org/lib/built-in-funcs.html>`_ function,
+    but returns an ndarray rather than a list.
+
+    When using a non-integer step, such as 0.1, the results will often not
+    be consistent.  It is better to use ``linspace`` for these cases.
+    """
+    # Get dtype
+    dtype = kwargs.pop('dtype', None)
+    if kwargs:
+        x = list(kwargs.keys())[0]
+        raise TypeError('arange() got an unexpected keyword argument %r' % x)
+    # Parse start, stop, step
+    if len(args) == 0:
+        raise TypeError('Required argument "start" not found')
+    elif len(args) == 1:
+        start, stop, step = 0, int(args[0]), 1
+    elif len(args) == 2:
+        start, stop, step = int(args[0]), int(args[1]), 1
+    elif len(args) == 3:
+        start, stop, step = int(args[0]), int(args[1]), int(args[2])
+    else:
+        raise TypeError('Too many input arguments')
+    # Init
+    iter = xrange(start, stop, step)
+    a = empty((len(iter),), dtype=dtype)
+    a[:] = list(iter)
+    return a
+
+
+def linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None):
+    """ linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)
+    
+    Return evenly spaced numbers over a specified interval. Returns num
+    evenly spaced samples, calculated over the interval [start, stop].
+    The endpoint of the interval can optionally be excluded.
+    """
+    # Prepare
+    start, stop = float(start), float(stop)
+    ra = stop - start
+    if endpoint:
+        step = ra / (num-1)
+    else:
+        step = ra / num
+    # Create
+    a = empty((num,), dtype)
+    a[:] = [start + i * step for i in xrange(num)]
+    # Return
+    if retstep:
+        return a, step
+    else:
+        return a
+
+def add(ndarray_vec1:ndarray, ndarray_vec2:ndarray):
+    c = []
+    for a, b in zip(ndarray_vec1, ndarray_vec2):
+        c.append(a+b)
+    cRay = array(c)
+    return cRay
+
+def subtract(ndarray_vec1:ndarray, ndarray_vec2:ndarray):
+    c = []
+    for a, b in zip(ndarray_vec1, ndarray_vec2):
+        c.append(a-b)
+    cRay = array(c)
+    return cRay
+
+def multiply(ndarray_vec1:ndarray, ndarray_vec2:ndarray):
+    c = []
+    for a, b in zip(ndarray_vec1, ndarray_vec2):
+        c.append(a*b)
+    cRay = array(c)
+    return cRay
+
+def divide(ndarray_vec1:ndarray, integer):
+    c = []
+    for a in ndarray_vec1:
+        c.append(a / integer)
+    cRay = array(c)
+    return cRay
+
+def cross(u:ndarray, v:ndarray):
+    """
+    Return the cross product of two 3 dimentional vectors.
+    """
+
+    uDim = len(u)
+    vDim = len(v)
+
+    uxv = []
+
+    # http://mathworld.wolfram.com/CrossProduct.html
+    if uDim == vDim == 3:
+        try:
+            for i in range(uDim):
+                uxv.append(0)
+                uxv = [u[1]*v[2]-u[2]*v[1], -(u[0]*v[2]-u[2]*v[0]),
+                       u[0]*v[1]-u[1]*v[0]]
+        except LinAlgError as e:
+            uxv = e
+    else:
+        raise IndexError('Vector has invalid dimensions')
+    return uxv
+
+def dot(u:ndarray, v:ndarray):
+    """
+    Return the dot product of two 3 dimentional vectors.
+    """
+
+    uDim = len(u)
+    vDim = len(v)
+
+    # http://reference.wolfram.com/language/ref/Dot.html
+    if uDim == vDim == 3:
+        try:
+            u_dot_v = sum(map(operator.mul, u, v))
+        except LinAlgError as e:
+            u_dot_v = e
+    else:
+        raise IndexError('Vector has invalid dimensions')
+    return u_dot_v
+
+from itertools import product
+
+# like argwhere in numpy
+def find_indices(array:ndarray, condition=lambda x: x != 0):
+    """
+    Find indices of elements in the given array that satisfy the given condition.
+
+    Parameters:
+    array -- An instance of the ndarray class.
+    condition -- A function that takes an element and returns a boolean (default: lambda x: x != 0).
+
+    Returns:
+    List of tuples representing indices of elements satisfying the condition.
+    """
+    indices = []
+    for idx in product(*map(range, array.shape)):
+        if condition(array[idx]):
+            indices.append(idx)
+    return indices
+
+def count_nonzero(array:ndarray, condition=lambda x: x != 0):
+    # tnp.count_nonzero(tnp.array([[1,2],[0,4]]))    --> 3  
+
+    # indices = 0
+    # for idx in product(*map(range, array.shape)):
+    #     if condition(array[idx]):
+    #         indices += 1
+    # return indices
+
+    return sum(1 for idx in product(*map(range, array.shape)) if condition(array[idx]))
+
+def flip(array:ndarray, axis=None):
+    """
+    Flip the array along the specified axis without using NumPy.
+
+    Parameters:
+    array -- A multi-dimensional list representing the array.
+    axis -- The axis along which to flip the array (default: None for flipping along the first non-singleton dimension).
+    """
+    # Convert the input to a nested list if it's not already
+    if not isinstance(array, list) or not all(isinstance(sublist, list) for sublist in array):
+        raise ValueError("Input should be a multi-dimensional list.")
+    
+    # Determine the shape of the array
+    shape = []
+    temp = array
+    while isinstance(temp, list):
+        shape.append(len(temp))
+        temp = temp[0] if temp else []
+    shape.reverse()  # Reverse to get correct dimension order
+    
+    # If no axis is provided, find the first non-singleton axis
+    if axis is None:
+        for ax, dim in enumerate(shape):
+            if dim > 1:
+                axis = ax
+                break
+        else:
+            # All dimensions are singleton, no need to flip
+            return array
+    
+    # Perform the flip operation
+    flipped = []
+    for index in product(*map(range, shape)):
+        # Construct the new index by flipping the specified axis
+        new_index = list(index)
+        new_index[axis] = shape[axis] - 1 - index[axis]
+        # Retrieve the element at the new index and append it to the result
+        item = array
+        for i in new_index:
+            item = item[i]
+        flipped.append(item)
+    
+    # Reshape the flipped list back into the original dimensions
+    result = flipped
+    for ax in range(len(shape) - 1, -1, -1):
+        if ax != axis:
+            result = [result[i:i+shape[ax]] for i in range(0, len(result), shape[ax])]
+    
+    return result
+
+# # 使用示例
+# # 假设有一个二维数组
+# my_array = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+# flipped_array = flip(my_array, 0)
+# print(flipped_array)  # 输出：[[6, 7, 8], [3, 4, 5], [0, 1, 2]]
+
+# # 或者自动找到非单例轴进行翻转
+# auto_flipped_array = flip(my_array)
+# print(auto_flipped_array)  # 同样输出：[[6, 7, 8], [3, 4, 5], [0, 1, 2]]
+
+def apply_function(array:ndarray, func):
+        if not callable(func):
+            raise TypeError("The 'func' argument must be a callable function.")
+
+        for idx in product(*map(range, array.shape)):
+            value = array[idx]
+            array[idx] = func(value)
+
+def maximum(array1:ndarray, array2:ndarray):
+    if array1.shape != array2.shape:
+        raise ValueError("Arrays must have the same shape.")
+
+    result = ndarray(shape=array1.shape, dtype=array1.dtype)
+    for idx in product(*map(range, array1.shape)):
+        result[idx] = max(array1[idx], array2[idx])
+    return result
+
+def minimum(array1:ndarray, array2:ndarray):
+    if array1.shape != array2.shape:
+        raise ValueError("Arrays must have the same shape.")
+
+    result = ndarray(shape=array1.shape, dtype=array1.dtype)
+    for idx in product(*map(range, array1.shape)):
+        result[idx] = min(array1[idx], array2[idx])
+    return result

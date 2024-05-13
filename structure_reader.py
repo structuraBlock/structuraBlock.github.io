@@ -1,6 +1,6 @@
 import nbtlib
 # numpy-1.26.4-cp311-cp311-emscripten_3_1_46_wasm32.whl -- > 12MB ???? what?
-from numpy import array, argwhere , int32, maximum, minimum, zeros, count_nonzero, flip
+# from numpy import array, argwhere , int32, maximum, minimum, zeros, count_nonzero, flip
 import python_modules.tinynumpy.tinynumpy as tnp
 import json
 loaded={}
@@ -14,7 +14,7 @@ def embed( small_array, big_array, loc):
     zstop=zstart+small_array.shape[2]
     big_array[xstart:xstop,ystart:ystop,zstart:zstop]=small_array
 class process_structure:
-    def __init__(self, file):
+    def __init__(self, file:str | dict | nbtlib.nbt.File):
         global loaded
         with open("lookups/nbt_defs.json") as nbt_file:
             self.nbt_defs=json.load(nbt_file)
@@ -33,23 +33,26 @@ class process_structure:
         self.blocks = list(map(int, self.NBTfile["structure"]["block_indices"][0]))
         self.size = list(map(int, self.NBTfile["size"]))
         self.palette = self.NBTfile["structure"]["palette"]["default"]["block_palette"]
-        self.mins = array(list(map(int,self.NBTfile["structure_world_origin"])))
-        # self.maxs = self.mins + array(self.size)-1 # nono
-        self.origin = array(list(map(int,self.NBTfile["structure_world_origin"])))
+        self.mins = tnp.array(self.NBTfile["structure_world_origin"])
+        # self.maxs = tnp.subtract(tnp.subtract(self.mins,self.size),[1,1,1]) # useless
+        self.origin = tnp.array(self.NBTfile["structure_world_origin"])
         self.get_blockmap()
     def get_layer_blocks(self,y):
         lb=self.cube[:,y,:]
-        return argwhere(lb > 0)
+        return tnp.find_indices(lb,lambda x: x>0)
     def get_blockmap(self):
         index_of_air = 0
         for i in range(len(self.palette)):
             if self.palette[i]["name"] == "minecraft:air":
                 index_of_air = i
                 break
-        self.cube = array(self.blocks)
-        self.cube += 1
+        self.cube = tnp.array(self.blocks)
+        self.cube = tnp.add(self.cube,tnp.ones_like(self.cube))
         self.palette = [{"name":"minecraft:air","states":[]}] + self.palette
-        self.cube[self.cube==index_of_air+1]=0
+        # self.cube[self.cube==index_of_air+1]=0
+        for i in range(len(self.cube)):
+                if self.cube[i] == index_of_air + 1:
+                    self.cube[i] = 0
         self.cube=self.cube.reshape(self.size)
 
     def get_block(self, x, y, z):
@@ -62,7 +65,7 @@ class process_structure:
     def get_block_list(self, ignored_blocks=["minecraft:air","minecraft:structure_block"]):
         block_counter = {}
         i=-2
-        block_array=array(self.blocks)
+        block_array=tnp.array(self.blocks)
         for block in self.palette:
             i+=1
             name=block["name"]
@@ -82,7 +85,7 @@ class process_structure:
                 if name not in block_counter.keys():
                     block_counter[name]=0
                 
-                block_counter[name]+=count_nonzero(block_array==i)
+                block_counter[name]+=tnp.count_nonzero(block_array,lambda x: x==i)
             
         return block_counter
 class combined_structures:
@@ -92,8 +95,8 @@ class combined_structures:
         with open("lookups/material_list_names.json") as nbt_file:
             self.block_names=json.load(nbt_file)
         self.structs={}
-        self.maxs = array([-2147483647,-2147483647,-2147483647],dtype=int32)
-        self.mins = array([2147483647,2147483647,2147483647],dtype=int32)
+        self.maxs = tnp.array([-2147483647,-2147483647,-2147483647],dtype="int32")
+        self.mins = tnp.array([2147483647,2147483647,2147483647],dtype="int32")
         palette_size=0
         self.palette=[{"name":"minecraft:air","states":[],"version":"17959425"}]
         
@@ -103,32 +106,32 @@ class combined_structures:
             if "" in self.structs[file]["nbt"].keys():
                 self.structs[file]["nbt"] = self.NBTfile[""]
             
-            self.structs[file]["blocks"] = array(list(map(int, self.structs[file]["nbt"]["structure"]["block_indices"][0])))
+            self.structs[file]["blocks"] = tnp.array(list(map(int, self.structs[file]["nbt"]["structure"]["block_indices"][0])))
             
-            self.structs[file]["size"] = array(list(map(int, self.structs[file]["nbt"]["size"])))
+            self.structs[file]["size"] = tnp.array(list(map(int, self.structs[file]["nbt"]["size"])))
             self.structs[file]["palette"] = self.structs[file]["nbt"]["structure"]["palette"]["default"]["block_palette"]
             index_of_air = 0
             for i in range(len(self.structs[file]["palette"])):
                 if self.structs[file]["palette"][i]["name"] == "minecraft:air":
                     index_of_air = i
-            self.structs[file]["mins"] = array(list(map(int,self.structs[file]["nbt"]["structure_world_origin"])))
+            self.structs[file]["mins"] = tnp.array(list(map(int,self.structs[file]["nbt"]["structure_world_origin"])))
             self.structs[file]["maxs"] = self.structs[file]["mins"] + self.structs[file]["size"]
-            self.maxs=maximum(self.maxs, self.structs[file]["maxs"])
-            self.mins=minimum(self.mins, self.structs[file]["mins"])
+            self.maxs=tnp.maximum(self.maxs, self.structs[file]["maxs"])
+            self.mins=tnp.minimum(self.mins, self.structs[file]["mins"])
             self.structs[file]["blocks"] = self.structs[file]["blocks"].reshape(self.structs[file]["size"])
             self.structs[file]["blocks"] = self.structs[file]["blocks"]+len(self.palette)
             self.structs[file]["blocks"][self.structs[file]["blocks"]==index_of_air+len(self.palette)]=0
             
             self.palette += self.structs[file]["palette"]
         self.size = self.maxs-self.mins
-        self.blocks = zeros(self.size, int)
+        self.blocks = tnp.zeros(self.size)
         for file in file_list:
             embed(self.structs[file]["blocks"],self.blocks,self.structs[file]["mins"]-self.mins)
-        self.blocks = flip(self.blocks,0)
-        self.blocks = flip(self.blocks,2)
+        self.blocks = tnp.flip(self.blocks,0)
+        self.blocks = tnp.flip(self.blocks,2)
     def get_layer_blocks(self,y):
         lb=self.blocks[:,y,:]
-        return argwhere(lb > 0)
+        return tnp.find_indices(lb,lambda x: x>0)
     def get_block(self, x, y, z):
         index = self.blocks[x, y, z]
         return self.palette[int(index)]
@@ -137,7 +140,7 @@ class combined_structures:
     def get_block_list(self, ignored_blocks=["minecraft:air"]):
         block_counter = {}
         i=-2
-        block_array=array(self.blocks)
+        block_array=tnp.array(self.blocks)
         for block in self.palette:
             i+=1
             name=block["name"]
@@ -157,7 +160,7 @@ class combined_structures:
                 if name not in block_counter.keys():
                     block_counter[name]=0
                 
-                block_counter[name]+=count_nonzero(block_array==i)
+                block_counter[name]+=tnp.count_nonzero(block_array,lambda x: x==i)
         return block_counter
         
     

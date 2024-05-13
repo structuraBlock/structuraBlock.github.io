@@ -263,7 +263,7 @@ class armorstandgeo:
                 python_list.append(flattened_row)
 
 
-            print("self.uv_array" , len(python_list[0]))
+            # print("self.uv_array" , len(python_list[0]))
             im = png.from_array(python_list,"RGBA",)
             im.save(name)
 
@@ -312,7 +312,8 @@ class armorstandgeo:
             impt=impt[:,0:16,:]
         image_array = tnp.zeros((16, 16, 4) ,'uint8')
         image_array[0:shape[0], 0:shape[1], 0:impt.shape[2]] = impt
-        image_array[:, :, 3] = image_array[:, :, 3] # * self.alpha
+        # image_array[:, :, 3] = image_array[:, :, 3] * self.alpha
+        tnp.apply_function(image_array[:, :, 3],lambda x:x*self.alpha)
         if type(self.uv_array) is type(None):
             self.uv_array = image_array
         else:
