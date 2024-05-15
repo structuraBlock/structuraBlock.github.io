@@ -4,25 +4,10 @@ import copy
 import time
 
 
-# from PIL import Image
-import python_modules.png as png
-# from numpy import array, ones, uint8, zeros
-import python_modules.tinynumpy.tinynumpy as tnp
+import png
+from numpy import array, empty, uint8, zeros
 
 debug=False
-def image_to_list(img):
-        width, height = img.size
-        image_list = []
-        for row in range(height):
-            row_list = []
-            for col in range(width):
-                pixel = img.getpixel((col, row))
-                if img.mode == 'RGB':
-                    row_list.append(list(pixel[:3]))  # 将元组转换为列表  # 如果是RGB模式，只取前三个值
-                else:
-                    row_list.append(list(pixel))
-            image_list.append(row_list)
-        return image_list
 
 class armorstandgeo:
     def __init__(self, name, alpha = 0.8,offsets=[0,0,0], size=[64, 64, 64], ref_pack="Vanilla_Resource_Pack"):
@@ -290,7 +275,7 @@ class armorstandgeo:
         with open(new_image_filename, 'rb') as file:
             reader = png.Reader(file)
             f = reader.read_flat()
-            image_flat_rgba = tnp.array(f[2],'uint8') # .transpose()
+            image_flat_rgba = array(f[2],uint8)
             impt = image_flat_rgba.reshape([len(image_flat_rgba)//16//f[3]["planes"], 16, f[3]["planes"]])
 
         shape=list(impt.shape)
@@ -302,17 +287,17 @@ class armorstandgeo:
             shape[1]=16
             impt=impt[:,0:16,:]
 
-        image_array = tnp.empty((16, 16, 4) ,'uint8')
+        image_array = empty([16, 16, 4],uint8)
         image_array.fill(255)
         image_array[0:shape[0], 0:shape[1], 0:impt.shape[2]] = impt
-        tnp.apply_function(image_array[:, :, 3],lambda x:x*self.alpha)
+        image_array[:, :, 3] = image_array[:, :, 3] * self.alpha
         if type(self.uv_array) is type(None):
             self.uv_array = image_array
         else:
             startshape = list(self.uv_array.shape)
             endshape = startshape.copy()
             endshape[0] += image_array.shape[0]
-            temp_new = tnp.zeros(tuple(endshape),'uint8')
+            temp_new = zeros(endshape, uint8)
             temp_new[0:startshape[0], :, :] = self.uv_array
             temp_new[startshape[0]:, :, :] = image_array
             self.uv_array = temp_new
