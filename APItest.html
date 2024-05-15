@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/pyscript/core.css">
 
 
-<script>
+<script type="text/javascript">
   function downloadFile() {
     const now = new Date();
  
@@ -63,12 +63,14 @@
  
     <div id="id_name">wait</div>
     <div id="download-div">wait and wait</div>
-    <script type="py" src="./APItest.py" config="./pyscript.toml" terminal></script>
+    <script type="py" config="./pyscript.toml" terminal></script>
 
-    <!-- <py-script>
-      from js import document
-      def toRed(  ):
-        document.getElementById("id_name").innerHTML = "red"
-    </py-script> -->
+    <py-script>
+      import sys
+      sys.path.append
+      
+      import APItest
+
+    </py-script>
 </body>
 </html>
