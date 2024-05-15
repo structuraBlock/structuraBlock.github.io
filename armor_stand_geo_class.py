@@ -5,7 +5,7 @@ import time
 
 
 # from PIL import Image
-import png
+import python_modules.png as png
 # from numpy import array, ones, uint8, zeros
 import python_modules.tinynumpy.tinynumpy as tnp
 

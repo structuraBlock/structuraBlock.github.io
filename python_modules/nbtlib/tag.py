@@ -85,7 +85,7 @@ __all__ = [
 from struct import Struct
 from struct import error as StructError
 
-import numpy as np
+import python_modules.numpy as np
 
 from .literal.serializer import serialize_tag
 
