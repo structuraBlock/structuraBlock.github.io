@@ -1,6 +1,6 @@
 
 name = "Holy Surf"
-packages = [  "certifi==2022.12.7","cffi==1.15.1","charset-normalizer==3.0.1","idna==3.4","packaging==23.1","platformdirs==3.0.0","pooch==1.7.0","pycparser==2.21","PyNaCl==1.5.0","urllib3==1.26.14" ]
+packages = [   ]
 
 [files]
 "animation_class.py" = "./animation_class.py"
@@ -1182,22 +1182,12 @@ packages = [  "certifi==2022.12.7","cffi==1.15.1","charset-normalizer==3.0.1","i
 "python_modules/nbtlib/literal/parser.py" = "./python_modules/nbtlib/literal/parser.py"
 "python_modules/nbtlib/literal/serializer.py" = "./python_modules/nbtlib/literal/serializer.py"
 "python_modules/nbtlib/literal/__init__.py" = "./python_modules/nbtlib/literal/__init__.py"
-"python_modules/nbtlib/literal/__pycache__/parser.cpython-311.pyc" = "./python_modules/nbtlib/literal/__pycache__/parser.cpython-311.pyc"
-"python_modules/nbtlib/literal/__pycache__/serializer.cpython-311.pyc" = "./python_modules/nbtlib/literal/__pycache__/serializer.cpython-311.pyc"
-"python_modules/nbtlib/literal/__pycache__/__init__.cpython-311.pyc" = "./python_modules/nbtlib/literal/__pycache__/__init__.cpython-311.pyc"
 "python_modules/nbtlib/nbt.py" = "./python_modules/nbtlib/nbt.py"
 "python_modules/nbtlib/path.py" = "./python_modules/nbtlib/path.py"
 "python_modules/nbtlib/schema.py" = "./python_modules/nbtlib/schema.py"
 "python_modules/nbtlib/tag.py" = "./python_modules/nbtlib/tag.py"
 "python_modules/nbtlib/__init__.py" = "./python_modules/nbtlib/__init__.py"
 "python_modules/nbtlib/__main__.py" = "./python_modules/nbtlib/__main__.py"
-"python_modules/nbtlib/__pycache__/cli.cpython-311.pyc" = "./python_modules/nbtlib/__pycache__/cli.cpython-311.pyc"
-"python_modules/nbtlib/__pycache__/nbt.cpython-311.pyc" = "./python_modules/nbtlib/__pycache__/nbt.cpython-311.pyc"
-"python_modules/nbtlib/__pycache__/path.cpython-311.pyc" = "./python_modules/nbtlib/__pycache__/path.cpython-311.pyc"
-"python_modules/nbtlib/__pycache__/schema.cpython-311.pyc" = "./python_modules/nbtlib/__pycache__/schema.cpython-311.pyc"
-"python_modules/nbtlib/__pycache__/tag.cpython-311.pyc" = "./python_modules/nbtlib/__pycache__/tag.cpython-311.pyc"
-"python_modules/nbtlib/__pycache__/__init__.cpython-311.pyc" = "./python_modules/nbtlib/__pycache__/__init__.cpython-311.pyc"
-"python_modules/nbtlib/__pycache__/__main__.cpython-311.pyc" = "./python_modules/nbtlib/__pycache__/__main__.cpython-311.pyc"
 "python_modules/nbtlib-2.0.4.dist-info/entry_points.txt" = "./python_modules/nbtlib-2.0.4.dist-info/entry_points.txt"
 "python_modules/nbtlib-2.0.4.dist-info/INSTALLER" = "./python_modules/nbtlib-2.0.4.dist-info/INSTALLER"
 "python_modules/nbtlib-2.0.4.dist-info/LICENSE" = "./python_modules/nbtlib-2.0.4.dist-info/LICENSE"
@@ -1640,9 +1630,3 @@ packages = [  "certifi==2022.12.7","cffi==1.15.1","charset-normalizer==3.0.1","i
 "python_modules/numpy/__init__.py" = "./python_modules/numpy/__init__.py"
 "python_modules/numpy/__init__.pyi" = "./python_modules/numpy/__init__.pyi"
 "python_modules/png.py" = "./python_modules/png.py"
-"python_modules/tinynumpy/tinylinalg.py" = "./python_modules/tinynumpy/tinylinalg.py"
-"python_modules/tinynumpy/tinynumpy.py" = "./python_modules/tinynumpy/tinynumpy.py"
-"python_modules/tinynumpy/__pycache__/installWheelTest.html" = "./python_modules/tinynumpy/__pycache__/installWheelTest.html"
-"python_modules/tinynumpy/__pycache__/installWheelTest.py" = "./python_modules/tinynumpy/__pycache__/installWheelTest.py"
-"python_modules/tinynumpy/__pycache__/testpyscript.toml" = "./python_modules/tinynumpy/__pycache__/testpyscript.toml"
-"python_modules/tinynumpy/__pycache__/tinynumpy.cpython-311.pyc" = "./python_modules/tinynumpy/__pycache__/tinynumpy.cpython-311.pyc"
