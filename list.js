@@ -6,7 +6,7 @@ const pathList = new Set()
 // clear
 fs.writeFileSync('./pyscript.toml',`
 name = "Holy Surf"
-packages = [ "certifi==2022.12.7","cffi==1.15.1","charset-normalizer==3.0.1","idna==3.4","nbtlib==2.0.4","packaging==23.1","platformdirs==3.0.0","pooch==1.7.0","pycparser==2.21","PyNaCl==1.5.0","requests==2.28.2","pypng","urllib3==1.26.14" ]
+packages = [ "certifi==2022.12.7","cffi==1.15.1","charset-normalizer==3.0.1","idna==3.4","packaging==23.1","platformdirs==3.0.0","pooch==1.7.0","pycparser==2.21","PyNaCl==1.5.0","requests==2.28.2","pypng","urllib3==1.26.14" ]
 
 [files]
 `, { flag: 'w' })

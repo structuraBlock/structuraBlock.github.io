@@ -1,4 +1,4 @@
-import nbtlib
+import python_modules.nbtlib as nbtlib
 
 import structura_core
 import shutil
