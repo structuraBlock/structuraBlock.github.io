@@ -69,12 +69,12 @@
       import os
       import zipfile
 
-      # 获取当前工作目录
+      
       current_dir = os.getcwd()
 
-      # 使用zipfile模块的ZipFile类打开ZIP文件
       with zipfile.ZipFile(os.path.join(current_dir,'./python_modules.zip'), 'r') as zip_ref:
-          # 解压ZIP文件的所有内容到当前目录
+          zip_ref.extractall('./')
+      with zipfile.ZipFile(os.path.join(current_dir,'./Vanilla_Resource_Pack.zip'), 'r') as zip_ref:
           zip_ref.extractall('./')
 
 

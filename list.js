@@ -65,11 +65,15 @@ const igoreFile = [
 // 从当前目录开始遍历
 walkDir('./')
 igoreFile.forEach(_=>pathList.delete(_))
-walkDirPro('./lookups')
-walkDirPro('./test_structures')
-walkDirPro('./Vanilla_Resource_Pack')
-// walkDirPro('./python_modules')   
-pathList.add('./python_modules.zip')
+
+const libDir = [
+    './lookups',
+    './test_structures',
+    './Vanilla_Resource_Pack',
+    './python_modules'
+]
+
+libDir.forEach(dir=>pathList.add(dir+'.zip'))
 
 pathList.forEach(relativePath=>
     fs.writeFileSync('./pyscript.toml', `"${relativePath}" = "./${relativePath}"\n`, { flag: 'a' })
@@ -80,12 +84,13 @@ console.log(pathList.size)
 
 // ###############
 const archiver = require('archiver');
+libDir.forEach(dir=>{
+    const output = fs.createWriteStream(__dirname + '/' + dir + '.zip');
+    const archive = archiver('zip', {zlib: {level: 9}});
+    
+    archive.pipe(output);
+    archive.directory(dir);
 
-const output = fs.createWriteStream(__dirname + '/python_modules.zip');
-const archive = archiver('zip', {zlib: {level: 9}});
- 
-archive.pipe(output);
-archive.directory('./python_modules');
+    archive.finalize();
+})
 
-
-archive.finalize();
