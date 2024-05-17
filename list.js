@@ -67,11 +67,12 @@ walkDir('./')
 igoreFile.forEach(_=>pathList.delete(_))
 
 const libDir = [
-    './lookups',
-    './test_structures',
-    './Vanilla_Resource_Pack',
-    './python_modules'
+    'lookups',
+    'test_structures',
+    'Vanilla_Resource_Pack',
+    'python_modules'
 ]
+igoreFile.forEach(_=>pathList.delete(_+'.zip'))
 
 libDir.forEach(dir=>pathList.add(dir+'.zip'))
 
