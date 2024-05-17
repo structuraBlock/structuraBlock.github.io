@@ -69,22 +69,15 @@
       import os
       import zipfile
 
-      # 获取当前目录
-      target_dir = os.getcwd()
-  
-      # 使用zipfile模块的ZipFile类打开ZIP文件
-      with zipfile.ZipFile('./python_modules.zip', 'r') as zip_ref:
-          # 解压ZIP文件的所有内容到当前目录
-          zip_ref.extractall('./')
       # 获取当前工作目录
       current_dir = os.getcwd()
 
-      # 使用os.listdir获取当前目录下的文件和子目录名
-      files_and_dirs = os.listdir( os.path.join(current_dir,'./python_modules'))
+      # 使用zipfile模块的ZipFile类打开ZIP文件
+      with zipfile.ZipFile(os.path.join(current_dir,'./python_modules.zip'), 'r') as zip_ref:
+          # 解压ZIP文件的所有内容到当前目录
+          zip_ref.extractall('./')
 
-      # 遍历并输出
-      for item in files_and_dirs:
-          print(item)
+
 #############################################################################################
 
       import sys
