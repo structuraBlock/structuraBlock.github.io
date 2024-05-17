@@ -1,6 +1,6 @@
 
 name = "Holy Surf"
-packages = [    ]
+packages = [ ]
 
 [files]
 "animation_class.py" = "./animation_class.py"
