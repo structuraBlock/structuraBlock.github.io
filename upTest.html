@@ -61,11 +61,15 @@
     <div id="download-div">wait and wait</div>
   
 
-
-
-  <script type="py" src="./upTest.py" config="./pyscript.toml" terminal></script>
+    <script type="py" config="./pyscript.toml" terminal></script>
+ 
+ 
 
     <py-script>
+      
+      import sys
+      sys.path.append('./python_modules')
+      
       from io import BytesIO
       from js import document, window, Uint8Array
       from pyodide.ffi.wrappers import add_event_listener
