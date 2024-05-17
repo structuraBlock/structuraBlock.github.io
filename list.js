@@ -68,9 +68,24 @@ igoreFile.forEach(_=>pathList.delete(_))
 walkDirPro('./lookups')
 walkDirPro('./test_structures')
 walkDirPro('./Vanilla_Resource_Pack')
-walkDirPro('./python_modules')   
+// walkDirPro('./python_modules')   
+pathList.add('./python_modules.zip')
 
 pathList.forEach(relativePath=>
     fs.writeFileSync('./pyscript.toml', `"${relativePath}" = "./${relativePath}"\n`, { flag: 'a' })
 )
 console.log(pathList.size)
+
+
+
+// ###############
+const archiver = require('archiver');
+
+const output = fs.createWriteStream(__dirname + '/python_modules.zip');
+const archive = archiver('zip', {zlib: {level: 9}});
+ 
+archive.pipe(output);
+archive.directory('./python_modules');
+
+
+archive.finalize();
