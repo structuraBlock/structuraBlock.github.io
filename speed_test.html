@@ -59,6 +59,13 @@
     <div id="download-div">wait and wait</div>
 
 
-  <script type="py" src="./speed_test.py" config="./pyscript.toml" terminal></script>
+  <script type="py"  config="./pyscript.toml" terminal></script>
+  <py-script>
+    import sys
+    sys.path.append('./python_modules')
+    
+    import speed_test
+
+  </py-script>
 </body>
 </html>
