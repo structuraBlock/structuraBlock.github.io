@@ -26,7 +26,6 @@ packages = [ ]
 "lookups/lookup_version.json" = "./lookups/lookup_version.json"
 "lookups/material_list_names.json" = "./lookups/material_list_names.json"
 "lookups/nbt_defs.json" = "./lookups/nbt_defs.json"
-"lookups/pack_icon.afphoto" = "./lookups/pack_icon.afphoto"
 "lookups/pack_icon.png" = "./lookups/pack_icon.png"
 "lookups/variants.json" = "./lookups/variants.json"
 "test_structures/All Blocks World/decorative.mcstructure" = "./test_structures/All Blocks World/decorative.mcstructure"
