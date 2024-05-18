@@ -1,12 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>i need a better gui</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>i need a better gui</title>
+  <script type="module" src="/pyscript/core.js"></script>
+  <link rel="stylesheet" href="/pyscript/core.css">
+  <script>
+    function downloadFile() {
+      const now = new Date();
+   
+  
+        const button = document.getElementById('downloadButton');
+        const url = button.innerHTML;
+        const mimeType = 'application/octet-stream'; // 你可以根据需要替换
+        const fileName = now.toString()+'火魄构建.mcpack'; // 你可以根据需要替换
+  
+        // 创建并触发下载
+        downloadBlobFromUrl(url, mimeType, fileName);
+    }
+  
+    // 从URL下载Blob并指定MIME类型和文件名的函数
+    function downloadBlobFromUrl(url, mimeType, fileName) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+  
+        // 创建一个Blob对象，指定MIME类型
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                link.href = URL.createObjectURL(blob);
+                link.type = mimeType;
+            })
+            .finally(() => {
+                // 触发下载
+                const event = new MouseEvent('click', { bubbles: true, cancelable: true, view: window });
+                link.dispatchEvent(event);
+  
+                // 清理
+                setTimeout(() => {
+                    URL.revokeObjectURL(link.href);
+                }, 0);
+            });
+    }
+    // 拿到id为x_input的输入框的内容
+    function get_input_value() {
+      const x_input = document.getElementById('x_input');
+      const y_input = document.getElementById('y_input');
+      const z_input = document.getElementById('z_input');
+      const x = x_input.value;
+      const y = y_input.value;
+      const z = z_input.value;
+      return [x,y,z];
+   }
+  </script>
 </head>
 <body>
-    <!-- 增加一个顶部标题，固定高度 ,上下居中-->
-    <div id="title" style="height: 50px;background-color: aqua;display: flex;align-items: center;padding-left: 30px;" >i need a better gui</div>
+  
+  <label for="Upload a File"></label>
+  <input type="file" id="file-upload">
+
+  <div>
+    <div>x:    <input type="number" id="x_input" placeholder="ym****?" value="0"> </div>
+    <div>y:    <input type="number" id="y_input" placeholder="ck****?" value="0"> </div>
+    <div>z:    <input type="number" id="z_input" placeholder="chen****?" value="0"> </div>
+    <div>nameTag:    <input type="text" id="nameTag" placeholder="pf****?" value="love"> </div>
+  </div>
+
+  <div>如果能点击，请点击下裁</div>
+  <div>click for download</div>
+  <button id="downloadButton" onclick="downloadFile()" style="display: none;">#</button>
+
+
+    <div id="id_name">wait</div>
+    <div id="download-div">wait and wait</div>
+  
+
+    <script type="py" config="./pyscript.toml" terminal></script>
+ 
+ 
+
+    <py-script>
+      import os
+      import zipfile
+
+      
+      current_dir = os.getcwd()
+
+      with zipfile.ZipFile(os.path.join(current_dir,'./libZip/python_modules.zip'), 'r') as zip_ref:
+          zip_ref.extractall('./')
+      with zipfile.ZipFile(os.path.join(current_dir,'./libZip/Vanilla_Resource_Pack.zip'), 'r') as zip_ref:
+          zip_ref.extractall('./')
+      with zipfile.ZipFile(os.path.join(current_dir,'./libZip/test_structures.zip'), 'r') as zip_ref:
+          zip_ref.extractall('./')
+      with zipfile.ZipFile(os.path.join(current_dir,'./libZip/lookups.zip'), 'r') as zip_ref:
+          zip_ref.extractall('./')
+
+
+#############################################################################################
+
+      import sys
+      sys.path.append('./python_modules')
+      
+      from io import BytesIO
+      from js import document, window, Uint8Array
+      from pyodide.ffi.wrappers import add_event_listener
+      
+      from upTest import conver
+
+      
+      async def upload_file_and_show(e):
+          print("#############################################################################################")
+          file_list = e.target.files
+          first_item = file_list.item(0)
+
+          my_bytes: bytes = await get_bytes_from_file(first_item)
+          file_buffer = BytesIO(my_bytes)
+
+          offset = [0,0,0]
+
+          try:
+            offset = [int(document.getElementById("x_input").value),int(document.getElementById("y_input").value),int(document.getElementById("z_input").value)]
+          except:
+            print(">* error--> offset,set offset to [0,0,0]")
+            pass
+          
+
+          nameTag = "love"
+
+          try:
+            nameTag = document.getElementById("nameTag").value
+            if nameTag == "":
+              print(">* error--> nameTag,set nameTag to 'love'")
+              nameTag = "love"
+          except:
+            print(">* error--> nameTag,set nameTag to 'love'")
+            pass
+          
+          
+          print(">> now!!!")
+          print(">> offset-->",offset)
+          print(">> nameTag-->",nameTag)
+          conver(nameTag,file_buffer,offset)
+
+      async def get_bytes_from_file(file):
+          array_buf = await file.arrayBuffer()
+          return array_buf.to_bytes()
+
+      add_event_listener(document.getElementById("file-upload"), "change", upload_file_and_show)
+    </py-script>
 </body>
 </html>

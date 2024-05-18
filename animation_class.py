@@ -54,7 +54,6 @@ class animations:
         with open(path_to_rc, "w+") as json_file:
             json.dump(self.default_size, json_file, indent=2)
     def export_big(self,pack_name,offset):
-        print(offset)
         self.default_size["animations"]["animation.armor_stand.ghost_blocks.scale"]["bones"]["ghost_blocks"]["rotation"]=[0,"-query.body_y_rotation", 0]
         self.default_size["animations"]["animation.armor_stand.ghost_blocks.scale"]["bones"]["ghost_blocks"]["position"]=[
             f"(-(query.position(0)-{int(offset[0])})*math.cos(query.body_y_rotation)-(query.position(2)-{int(offset[2])})*math.sin(query.body_y_rotation))*16",

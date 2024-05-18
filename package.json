@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build":"node list.js"
+    "build": "node list.js"
   },
   "dependencies": {
     "@pyscript/core": "^0.4.27",
