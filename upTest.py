@@ -5,7 +5,7 @@ import shutil
 structura_core.debug=True
 
 def conver(name_tag,file,offset=[-32,0,-31]):
-    print("do i")
+    print(">> so do i")
     nbt = nbtlib.File.from_fileobj(file, byteorder='little')
 
     try:
