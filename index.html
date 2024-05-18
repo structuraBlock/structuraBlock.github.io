@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>选择结构文件并生成投影的测试</title>
+  <title>i need a better gui</title>
   <script type="module" src="/pyscript/core.js"></script>
   <link rel="stylesheet" href="/pyscript/core.css">
   <script>
@@ -44,6 +44,16 @@
                 }, 0);
             });
     }
+    // 拿到id为x_input的输入框的内容
+    function get_input_value() {
+      const x_input = document.getElementById('x_input');
+      const y_input = document.getElementById('y_input');
+      const z_input = document.getElementById('z_input');
+      const x = x_input.value;
+      const y = y_input.value;
+      const z = z_input.value;
+      return [x,y,z];
+   }
   </script>
 </head>
 <body>
@@ -51,6 +61,12 @@
   <label for="Upload a File"></label>
   <input type="file" id="file-upload">
 
+  <div>
+    <div>x:    <input type="number" id="x_input" placeholder="ym****?" value="0"> </div>
+    <div>y:    <input type="number" id="y_input" placeholder="ck****?" value="0"> </div>
+    <div>z:    <input type="number" id="z_input" placeholder="chen****?" value="0"> </div>
+    <div>nameTag:    <input type="text" id="nameTag" placeholder="pf****?" value="love"> </div>
+  </div>
 
   <div>如果能点击，请点击下裁</div>
   <div>click for download</div>
@@ -95,14 +111,38 @@
 
       
       async def upload_file_and_show(e):
+          print("#############################################################################################")
           file_list = e.target.files
           first_item = file_list.item(0)
 
           my_bytes: bytes = await get_bytes_from_file(first_item)
           file_buffer = BytesIO(my_bytes)
-          print("#############################################################################################")
-          print("now!!!")
-          conver("yh",file_buffer)
+
+          offset = [0,0,0]
+
+          try:
+            offset = [int(document.getElementById("x_input").value),int(document.getElementById("y_input").value),int(document.getElementById("z_input").value)]
+          except:
+            print(">* error--> offset,set offset to [0,0,0]")
+            pass
+          
+
+          nameTag = "love"
+
+          try:
+            nameTag = document.getElementById("nameTag").value
+            if nameTag == "":
+              print(">* error--> nameTag,set nameTag to 'love'")
+              nameTag = "love"
+          except:
+            print(">* error--> nameTag,set nameTag to 'love'")
+            pass
+          
+          
+          print(">> now!!!")
+          print(">> offset-->",offset)
+          print(">> nameTag-->",nameTag)
+          conver(nameTag,file_buffer,offset)
 
       async def get_bytes_from_file(file):
           array_buf = await file.arrayBuffer()
