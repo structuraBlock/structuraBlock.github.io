@@ -44,16 +44,6 @@
                 }, 0);
             });
     }
-    // 拿到id为x_input的输入框的内容
-    function get_input_value() {
-      const x_input = document.getElementById('x_input');
-      const y_input = document.getElementById('y_input');
-      const z_input = document.getElementById('z_input');
-      const x = x_input.value;
-      const y = y_input.value;
-      const z = z_input.value;
-      return [x,y,z];
-   }
   </script>
 </head>
 <body>
@@ -66,6 +56,7 @@
     <div>y:    <input type="number" id="y_input" placeholder="ck****?" value="0"> </div>
     <div>z:    <input type="number" id="z_input" placeholder="chen****?" value="0"> </div>
     <div>nameTag:    <input type="text" id="nameTag" placeholder="pf****?" value="love"> </div>
+    <div>opacity:    <input type="text" id="opacity" placeholder="pf****?" value="20"> </div>
   </div>
 
   <div>如果能点击，请点击下裁</div>
@@ -138,11 +129,20 @@
             print(">* error--> nameTag,set nameTag to 'love'")
             pass
           
+          opacity = 20
+
+          try:
+            opacity = int(document.getElementById("opacity").value)
+          except:
+            print(">* error--> opacity,set opacity to '20'")
+            pass
+          
           
           print(">> now!!!")
           print(">> offset-->",offset)
           print(">> nameTag-->",nameTag)
-          conver(nameTag,file_buffer,offset)
+          print(">> opacity-->",opacity)
+          conver(nameTag,file_buffer,offset,opacity)
 
       async def get_bytes_from_file(file):
           array_buf = await file.arrayBuffer()

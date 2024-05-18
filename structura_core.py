@@ -101,7 +101,7 @@ class structura:
             # shutil.copyfile(self.structure_files[model_name]["file"], "{}/{}.mcstructure".format(self.pack_name,model_name))
             # print(type(self.structure_files[model_name]["file"])) - > <class 'nbtlib.nbt.File'>
             if debug:
-                print(self.structure_files[model_name]['offsets'])
+                print('>> DEBUG--> offsets-->',self.structure_files[model_name]['offsets'])
             struct2make = structure_reader.process_structure(self.structure_files[model_name]["file"])
             blocks=self._add_blocks_to_geo(struct2make,model_name)
             self.structure_files[model_name]["block_list"]=blocks

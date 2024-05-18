@@ -27,7 +27,7 @@ structura_base=structura_core.structura("tmp/all_blocks")
 structura_base.set_opacity(20)
 
 for name_tag, info in files_to_conver.items():
-    print(f'{name_tag}, {info}')
+    print(f'##{name_tag}, {info}')
     
     structura_base.add_model(name_tag,info["file"])
     structura_base.set_model_offset(name_tag,info["offset"])
