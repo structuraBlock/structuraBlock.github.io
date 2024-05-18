@@ -61,6 +61,24 @@
 
   <script type="py"  config="./pyscript.toml" terminal></script>
   <py-script>
+    import os
+    import zipfile
+
+    
+    current_dir = os.getcwd()
+
+    with zipfile.ZipFile(os.path.join(current_dir,'./libZip/python_modules.zip'), 'r') as zip_ref:
+        zip_ref.extractall('./')
+    with zipfile.ZipFile(os.path.join(current_dir,'./libZip/Vanilla_Resource_Pack.zip'), 'r') as zip_ref:
+        zip_ref.extractall('./')
+    with zipfile.ZipFile(os.path.join(current_dir,'./libZip/test_structures.zip'), 'r') as zip_ref:
+        zip_ref.extractall('./')
+    with zipfile.ZipFile(os.path.join(current_dir,'./libZip/lookups.zip'), 'r') as zip_ref:
+        zip_ref.extractall('./')
+
+
+#############################################################################################
+
     import sys
     sys.path.append('./python_modules')
     
