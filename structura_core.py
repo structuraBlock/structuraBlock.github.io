@@ -201,12 +201,6 @@ class structura:
         shutil.copyfile(larger_render, larger_render_path)
         self.rc.export(self.pack_name)
         
-        # 遍历这个目录
-        file_paths = []
-        for root, dirs, files in os.walk('temp'):
-            for file in files:
-                file_paths.append(os.path.join(root, file))
-        print("file_paths",file_paths)
 
         mcpack = prepare_compressed_data_for_js(self.pack_name)
         shutil.rmtree(self.pack_name)
