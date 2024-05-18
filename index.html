@@ -72,13 +72,13 @@
       
       current_dir = os.getcwd()
 
-      with zipfile.ZipFile(os.path.join(current_dir,'./python_modules.zip'), 'r') as zip_ref:
+      with zipfile.ZipFile(os.path.join(current_dir,'./libZip/python_modules.zip'), 'r') as zip_ref:
           zip_ref.extractall('./')
-      with zipfile.ZipFile(os.path.join(current_dir,'./Vanilla_Resource_Pack.zip'), 'r') as zip_ref:
+      with zipfile.ZipFile(os.path.join(current_dir,'./libZip/Vanilla_Resource_Pack.zip'), 'r') as zip_ref:
           zip_ref.extractall('./')
-      with zipfile.ZipFile(os.path.join(current_dir,'./test_structures.zip'), 'r') as zip_ref:
+      with zipfile.ZipFile(os.path.join(current_dir,'./libZip/test_structures.zip'), 'r') as zip_ref:
           zip_ref.extractall('./')
-      with zipfile.ZipFile(os.path.join(current_dir,'./lookups.zip'), 'r') as zip_ref:
+      with zipfile.ZipFile(os.path.join(current_dir,'./libZip/lookups.zip'), 'r') as zip_ref:
           zip_ref.extractall('./')
 
 
