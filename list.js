@@ -57,6 +57,7 @@ const igoreFile = [
     "index.js",
     "index.html",
     "upTest.html",
+    "speed_test.html",
     "speedTest.html",
     "APItest.html",
     "gui.html",
@@ -72,9 +73,8 @@ const libDir = [
     'Vanilla_Resource_Pack',
     'python_modules'
 ]
-igoreFile.forEach(_=>pathList.delete(_+'.zip'))
 
-libDir.forEach(dir=>pathList.add(dir+'.zip'))
+libDir.forEach(dir=>pathList.add('libZip/'+dir+'.zip'))
 
 pathList.forEach(relativePath=>
     fs.writeFileSync('./pyscript.toml', `"${relativePath}" = "./${relativePath}"\n`, { flag: 'a' })
@@ -86,7 +86,7 @@ console.log(pathList.size)
 // ###############
 const archiver = require('archiver');
 libDir.forEach(dir=>{
-    const output = fs.createWriteStream(__dirname + '/' + dir + '.zip');
+    const output = fs.createWriteStream(__dirname + '/libZip/' + dir + '.zip');
     const archive = archiver('zip', {zlib: {level: 9}});
     
     archive.pipe(output);
