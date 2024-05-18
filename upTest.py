@@ -16,7 +16,7 @@ def conver(name_tag,file,offset=[-32,0,-31]):
     structura_base.set_opacity(20)
 
 
-    print("Run!!!!!!!",f'{name_tag}, {offset}')
+    print(f'>> 名称标签-->{name_tag}, 坐标偏移--> {offset}')
         
     structura_base.add_model(name_tag,nbt)
     structura_base.set_model_offset(name_tag,offset)
