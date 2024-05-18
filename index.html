@@ -100,9 +100,9 @@
 
           my_bytes: bytes = await get_bytes_from_file(first_item)
           file_buffer = BytesIO(my_bytes)
+          print("#############################################################################################")
           print("now!!!")
           conver("yh",file_buffer)
-          # print(my_bytes[:10]) # Do something with file contents
 
       async def get_bytes_from_file(file):
           array_buf = await file.arrayBuffer()
