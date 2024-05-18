@@ -24,7 +24,7 @@ def conver(name_tag,file,offset=[-32,0,-31],opacity=20):
     # structura_base.generate_nametag_file()
     structura_base.generate_with_nametags()
     info = structura_base.compile_pack()
-    print('>> ',info)
+    # print('>>',info)
     # print(structura_base.make_nametag_block_lists())
 
     print(">> Done!!")

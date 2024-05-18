@@ -215,7 +215,7 @@ class structura:
         document.getElementById("downloadButton").innerHTML = url
         document.getElementById("downloadButton").style.display = "block"
 
-        print("Pack Making Completed")
+        print(">> Pack Making Completed")
         self.timers["finished"]=time.time()-self.timers["previous"]
         self.timers["total"]=time.time()-self.timers["start"]
         
