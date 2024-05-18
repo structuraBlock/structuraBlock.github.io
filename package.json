@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "build":"node list.js"
+  },
   "dependencies": {
     "@pyscript/core": "^0.4.27",
     "archiver": "^7.0.1",
