@@ -1,6 +1,8 @@
 # in web 
 # from structura file to Minecraft 3D rescuePack
 
+# TODO
+        follow MIT license
 # log
 ```
     1.0.0 - beta
