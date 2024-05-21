@@ -2,7 +2,7 @@
 # from structura file to Minecraft 3D rescuePack
 
 # TODO
-        add MIT license to some files
+        for navigator.language
 # log
 ```
     1.0.0 - beta
@@ -14,6 +14,3 @@
     new gui
         
 ```
-
-# LICENSE
-## Waiting for LICENSE and additional Notice to be added
