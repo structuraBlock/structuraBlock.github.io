@@ -6,7 +6,28 @@
   <title>i need a better gui</title>
   <script type="module" src="/pyscript/core.js"></script>
   <link rel="stylesheet" href="/pyscript/core.css">
-  <script>
+  <style>
+    .drop-zone {
+        width: 200px;
+        height: 200px;
+        border: 2px dashed #333;
+        border-radius: 4px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        font-size: 16px;
+        margin: 20px;
+    }
+
+    .hidden {
+        display: none;
+    }
+</style>
+  <script type="text/javascript">
     function downloadFile() {
       const now = new Date();
    
@@ -44,22 +65,20 @@
                 }, 0);
             });
     }
-    // 拿到id为x_input的输入框的内容
-    function get_input_value() {
-      const x_input = document.getElementById('x_input');
-      const y_input = document.getElementById('y_input');
-      const z_input = document.getElementById('z_input');
-      const x = x_input.value;
-      const y = y_input.value;
-      const z = z_input.value;
-      return [x,y,z];
-   }
   </script>
+
+  
+
+
 </head>
 <body>
-  
-  <label for="Upload a File"></label>
-  <input type="file" id="file-upload">
+  <div class="drop-zone" id="dropZone">
+    点击加载文件
+</div>
+
+<input type="file" class="hidden" id="fileInput" onchange="handleFiles(this.files)">
+
+<ul id="fileList"></ul>
 
   <div>
     <div>x:    <input type="number" id="x_input" placeholder="ym****?" value="0"> </div>
@@ -67,9 +86,11 @@
     <div>z:    <input type="number" id="z_input" placeholder="chen****?" value="0"> </div>
     <div>nameTag:    <input type="text" id="nameTag" placeholder="pf****?" value="love"> </div>
   </div>
+ 
+  <button id="run">点击开始制作</button>
 
-  <div>如果能点击，请点击下裁</div>
-  <div>click for download</div>
+  <div><font class="lang">click for download</font></div>
+  <div>如果下面长条的按钮能点击，请点击下裁</div>
   <button id="downloadButton" onclick="downloadFile()" style="display: none;">#</button>
 
 
@@ -79,13 +100,11 @@
 
     <script type="py" config="./pyscript.toml" terminal></script>
  
- 
-
-    <py-script>
+     <py-script>
       import os
       import zipfile
+      import js
 
-      
       current_dir = os.getcwd()
 
       with zipfile.ZipFile(os.path.join(current_dir,'./libZip/python_modules.zip'), 'r') as zip_ref:
@@ -98,25 +117,23 @@
           zip_ref.extractall('./')
 
 
-#############################################################################################
-
       import sys
       sys.path.append('./python_modules')
       
+          ############################################################
+
+      
       from io import BytesIO
-      from js import document, window, Uint8Array
+      from js import document
       from pyodide.ffi.wrappers import add_event_listener
       
-      from upTest import conver
+      from upTest import add,conver
 
+      files = []
       
-      async def upload_file_and_show(e):
-          print("#############################################################################################")
-          file_list = e.target.files
-          first_item = file_list.item(0)
-
-          my_bytes: bytes = await get_bytes_from_file(first_item)
-          file_buffer = BytesIO(my_bytes)
+      async def run(e):
+          print("############################################################")
+          file_buffer = files[0]
 
           offset = [0,0,0]
 
@@ -142,13 +159,143 @@
           print(">> now!!!")
           print(">> offset-->",offset)
           print(">> nameTag-->",nameTag)
-          conver(nameTag,file_buffer,offset)
+          add(nameTag,file_buffer,offset)
+          conver()
 
       async def get_bytes_from_file(file):
           array_buf = await file.arrayBuffer()
           return array_buf.to_bytes()
 
-      add_event_listener(document.getElementById("file-upload"), "change", upload_file_and_show)
+      async def upload_file_and_show(e):
+        print("############################################################")
+        print(">> 导入成功，请点击开始制作")
+        file_list = e.target.files
+        first_item = file_list.item(0)
+
+        my_bytes: bytes = await get_bytes_from_file(first_item)
+        file_buffer = BytesIO(my_bytes)
+
+        del first_item
+        del my_bytes
+
+        files.append(file_buffer)
+        <!-- for i in files:
+          print("first_item:", i) -->
+
+
+      fileInput = document.getElementById('fileInput')
+      runButton = document.getElementById('run')
+      add_event_listener(fileInput, "change", upload_file_and_show)
+      add_event_listener(runButton, "click", run)
+      
     </py-script>
+
+    <script type="text/javascript">
+  
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+      const fileList = document.getElementById('fileList');
+      let filesArray = [];
+  
+      // 阻止默认的拖放行为
+      dropZone.addEventListener('dragenter', (event) => {
+          event.preventDefault();
+          dropZone.style.backgroundColor = '#eaeaea';
+      });
+  
+      dropZone.addEventListener('dragleave', (event) => {
+          event.preventDefault();
+          dropZone.style.backgroundColor = '';
+      });
+  
+      dropZone.addEventListener('dragover', (event) => {
+          event.preventDefault();
+      });
+  
+      // 处理文件拖放到区域
+      dropZone.addEventListener('drop', (event) => {
+          event.preventDefault();
+          dropZone.style.backgroundColor = '';
+  
+          const newFiles = event.dataTransfer.files;
+          addFiles(newFiles);
+      });
+  
+      // 点击拖放区域时，触发隐藏的文件输入框
+      dropZone.addEventListener('click', () => {
+          fileInput.click();
+      });
+  
+      function handleFiles(newFiles) {
+          addFiles(newFiles);
+      }
+  
+      function addFiles(newFiles) {
+          for (let i = 0; i < newFiles.length; i++) {
+              const file = newFiles[i];
+              if (!filesArray.includes(file)) {
+                  filesArray.push(file);
+                  const li = document.createElement('li');
+                  li.classList.add('file-item');
+                  li.textContent = `文件 ${filesArray.length}: ${file.name}`;
+                  li.file = file;
+                  li.addEventListener('click', toggleDelete);
+                  fileList.appendChild(li);
+              }
+          }
+          sortFiles();
+      }
+  
+      function removeFile(file) {
+          const index = filesArray.indexOf(file);
+          if (index !== -1) {
+              filesArray.splice(index, 1);
+              const li = document.getElementById(`file-${file.name}`);
+              if (li) {
+                  li.remove();
+              }
+          }
+      }
+  
+      function toggleDelete(event) {
+          const li = event.target;
+          li.classList.toggle('delete');
+          if (li.classList.contains('delete')) {
+              removeFile(li.file);
+          }
+      }
+  
+      function sortFiles() {
+          filesArray.sort((a, b) => a.name.localeCompare(b.name));
+          fileList.innerHTML = '';
+          filesArray.forEach(file => {
+              const li = document.createElement('li');
+              li.classList.add('file-item');
+              li.textContent = `文件 ${filesArray.indexOf(file) + 1}: ${file.name}`;
+              li.file = file;
+              li.addEventListener('click', toggleDelete);
+              fileList.appendChild(li);
+          });
+      }
+  </script>
+
+    <script>
+
+      const texts = new Map([
+          ["nit", "再捏"],
+          ["再捏", "再捏"]
+      ])
+       
+          const 获取全部font元素 = document.getElementsByTagName("font");
+          console.log(获取全部font元素);
+          // 遍历
+          for (let i = 0; i < 获取全部font元素.length; i++) {
+              const element = 获取全部font元素[i];
+              console.log(JSON.stringify(element.innerText.trim()))
+              if(element.classList.contains("lang"))
+                  element.innerText = texts.get(element.innerText.trim())  ??  element.innerText
+          }
+      </script>
+
 </body>
 </html>
