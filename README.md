@@ -2,7 +2,7 @@
 # from structura file to Minecraft 3D rescuePack
 
 # TODO
-        follow MIT license
+        add MIT license to some files
 # log
 ```
     1.0.0 - beta
