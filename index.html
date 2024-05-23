@@ -71,31 +71,36 @@
 
 
 </head>
+
+<font class="lang"></font>
 <body>
   <div class="drop-zone" id="dropZone">
-    点击加载文件
+    <font class="lang">Click for upload structure file</font>
 </div>
 
 <input type="file" class="hidden" id="fileInput" onchange="handleFiles(this.files)">
 
 <ul id="fileList"></ul>
 
-  <div>
+  <div style="background-color:cadetblue;padding: 30px;">
+    <font class="lang">coordinate offset x*y*z</font>
     <div>x:    <input type="number" id="x_input" placeholder="ym****?" value="0"> </div>
     <div>y:    <input type="number" id="y_input" placeholder="ck****?" value="0"> </div>
     <div>z:    <input type="number" id="z_input" placeholder="chen****?" value="0"> </div>
-    <div>nameTag:    <input type="text" id="nameTag" placeholder="pf****?" value="love"> </div>
   </div>
  
-  <button id="run">点击开始制作</button>
+  <div style="background-color:aliceblue;padding: 30px;"><font class="lang">nameTag</font>:  <input type="text" id="nameTag" placeholder="pf****?" value="love"> </div>
 
-  <div><font class="lang">click for download</font></div>
-  <div>如果下面长条的按钮能点击，请点击下裁</div>
+  <button id="run"><font class="lang">Click for run</font></font></button>
+
   <button id="downloadButton" onclick="downloadFile()" style="display: none;">#</button>
 
+  <font class="lang" id="download-div" >wait and wait</font>
+  <div id="loading"> ****************** </div>
 
-    <div id="id_name">wait</div>
-    <div id="download-div">wait and wait</div>
+<script>
+  document.getElementById("loading").innerText = "loading..."
+</script>
   
 
     <script type="py" config="./pyscript.toml" terminal></script>
@@ -283,18 +288,27 @@
 
       const texts = new Map([
           ["nit", "再捏"],
-          ["再捏", "再捏"]
+          ["Click for upload structure file", "点击上传结构文件"],
+          ["coordinate offset x*y*z", "坐标偏移 <x y z>"],
+          ["nameTag", "实体渲染所需的名称"],
+          ["Click for run", "点击开始制作"],
+          ["wait and wait", "等我！"],
+          ["i am ready", "好啦！"],
       ])
-       
-          const 获取全部font元素 = document.getElementsByTagName("font");
+      if(navigator.language.toLowerCase()==='zh-CN'.toLowerCase() || navigator.language.toLowerCase()==='zh-TW'.toLowerCase()){
+        console.log('lang is zh-CN')
+        const 获取全部font元素 = document.getElementsByTagName("font");
           console.log(获取全部font元素);
           // 遍历
           for (let i = 0; i < 获取全部font元素.length; i++) {
               const element = 获取全部font元素[i];
-              console.log(JSON.stringify(element.innerText.trim()))
+              // console.log(JSON.stringify(element.innerText.trim()))
               if(element.classList.contains("lang"))
                   element.innerText = texts.get(element.innerText.trim())  ??  element.innerText
           }
+      }
+       
+
       </script>
 
 </body>
