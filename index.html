@@ -97,8 +97,16 @@
     <li><button id="downloadButton" onclick="downloadFile()" style="display: none;">#</button></li>
   </ul>
 
+  <font id="resourceloading" style="z-index: 1999">0%</font>
+  <script>
+    setInterval(function () {
+      // document.getElementById("resourceloading").innerText = performance.getEntriesByType('resource').length;
+      document.getElementById("resourceloading").innerText 
+      = (performance.getEntriesByType('resource').reduce((acc,cur)=>acc+cur.decodedBodySize,0) / 18174363 * 100).toFixed(2)+"%";
+    }, 100);
+  </script>
 
-  <img id="pyLoading" width="100px" style="background-color: #333;padding: auto;;height: 70%;width: auto;z-index: 999;position: absolute;top:0px;image-rendering:pixelated;display:block;" src="data:image/gif;base64,R0lGODlhAgACAPEAAAAAAD1ucDI+TwAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJHgAAACwAAAAAAgACAAECAgxeACH5BAkeAAAALAAAAAACAAIAAQIDVAAFACH5BAkeAAAALAAAAAACAAIAAQIDlBAFACH5BAgeAAAALAAAAAACAAIAAQIDlCIFACH5BAgeAAAALAAAAAACAAIAAQICjF4AIfkECR4AAAAsAAAAAAIAAgABAgMMJAUAIfkECR4AAAAsAAAAAAIAAgABAgMMBAUAOw==">
+  <img id="pyLoading" width="100px" style="padding-right:100% ;padding-top: 10%;padding-bottom: 70%;background-color:antiquewhite;;height: 70%;width: auto;z-index: -999;position: absolute;top:0px;image-rendering:pixelated;display:block;" src="data:image/gif;base64,R0lGODlhAgACAPEAAAAAAD1ucDI+TwAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJHgAAACwAAAAAAgACAAECAgxeACH5BAkeAAAALAAAAAACAAIAAQIDVAAFACH5BAkeAAAALAAAAAACAAIAAQIDlBAFACH5BAgeAAAALAAAAAACAAIAAQIDlCIFACH5BAgeAAAALAAAAAACAAIAAQICjF4AIfkECR4AAAAsAAAAAAIAAgABAgMMJAUAIfkECR4AAAAsAAAAAAIAAgABAgMMBAUAOw==">
  
   
 
