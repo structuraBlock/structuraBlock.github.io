@@ -91,16 +91,15 @@
  
   <div style="background-color:aliceblue;padding: 30px;"><font class="lang">nameTag</font>:  <input type="text" id="nameTag" placeholder="pf****?" value="love"> </div>
 
-  <button id="run"><font class="lang">Click for run</font></font></button>
+  <button id="run" style="display: none;padding: 20px;"><font class="lang">Click for run</font></font></button>
 
-  <button id="downloadButton" onclick="downloadFile()" style="display: none;">#</button>
+  <ul>
+    <li><button id="downloadButton" onclick="downloadFile()" style="display: none;">#</button></li>
+  </ul>
 
-  <font class="lang" id="download-div" >wait and wait</font>
-  <div id="loading"> ****************** </div>
 
-<script>
-  document.getElementById("loading").innerText = "loading..."
-</script>
+  <img id="pyLoading" width="100px" style="image-rendering:pixelated;display:block;" src="data:image/gif;base64,R0lGODlhAgACAPEAAAAAAD1ucDI+TwAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJHgAAACwAAAAAAgACAAECAgxeACH5BAkeAAAALAAAAAACAAIAAQIDVAAFACH5BAkeAAAALAAAAAACAAIAAQIDlBAFACH5BAgeAAAALAAAAAACAAIAAQIDlCIFACH5BAgeAAAALAAAAAACAAIAAQICjF4AIfkECR4AAAAsAAAAAAIAAgABAgMMJAUAIfkECR4AAAAsAAAAAAIAAgABAgMMBAUAOw==">
+ 
   
 
     <script type="py" config="./pyscript.toml" terminal></script>
@@ -125,7 +124,7 @@
       import sys
       sys.path.append('./python_modules')
       
-          ############################################################
+          ##################################
 
       
       from io import BytesIO
@@ -137,7 +136,7 @@
       files = []
       
       async def run(e):
-          print("############################################################")
+          print("##################################")
           file_buffer = files[0]
 
           offset = [0,0,0]
@@ -172,7 +171,7 @@
           return array_buf.to_bytes()
 
       async def upload_file_and_show(e):
-        print("############################################################")
+        print("##################################")
         print(">> 导入成功，请点击开始制作")
         file_list = e.target.files
         first_item = file_list.item(0)
@@ -184,15 +183,17 @@
         del my_bytes
 
         files.append(file_buffer)
-        <!-- for i in files:
-          print("first_item:", i) -->
+        document.getElementById("run").style.display = "block"
+
 
 
       fileInput = document.getElementById('fileInput')
       runButton = document.getElementById('run')
       add_event_listener(fileInput, "change", upload_file_and_show)
       add_event_listener(runButton, "click", run)
-      
+
+      document.getElementById("pyLoading").style.display = "none"
+
     </py-script>
 
     <script type="text/javascript">

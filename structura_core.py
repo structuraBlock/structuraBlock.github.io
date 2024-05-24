@@ -232,7 +232,6 @@ class structura:
         file = File.new([js_array], "unused_file_name.zip")
         url = URL.createObjectURL(file)
                     
-        document.getElementById("download-div").innerHTML = "i am ready"
         document.getElementById("downloadButton").innerHTML = url
         document.getElementById("downloadButton").style.display = "block"
 
