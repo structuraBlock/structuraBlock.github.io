@@ -39,9 +39,16 @@ class armorstandgeo:
         with open("{}/blocks.json".format(self.ref_resource_pack)) as f:
             ## defines the blocks from the NBT name tells us sides vs textures
             self.blocks_def = json.load(f)
+        with open("lookups/blocks_fix.json") as f:
+            ## fix by wanasleep
+            self.blocks_def.update(json.load(f))
         with open("{}/textures/terrain_texture.json".format(self.ref_resource_pack)) as f:
             ##maps textures names to texture files.
             self.terrain_texture = json.load(f)
+        with open("lookups/terrain_texture_fix.json") as f:
+            ## fix
+            # json.load(f).update(self.terrain_texture)
+            self.terrain_texture["texture_data"].update(json.load(f)["texture_data"])
         with open("lookups/block_rotation.json") as f:
             ## custom look up table i wrote to help with rotations, error messages dump if somehting has undefined rotations 
             self.block_rotations = json.load(f)

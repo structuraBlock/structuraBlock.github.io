@@ -3,27 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>i need a better gui</title>
+  <title>BE structure to rec pack</title>
   <script type="module" src="/pyscript/core.js"></script>
   <link rel="stylesheet" href="/pyscript/core.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2730743460263749"
      crossorigin="anonymous"></script>
   <style>
-    .drop-zone {
-        width: 200px;
-        height: 200px;
-        border: 2px dashed #333;
-        border-radius: 4px;
-        padding: 20px;
-        text-align: center;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #333;
-        font-size: 16px;
-        margin: 20px;
-    }
+.drop-zone {
+    width: 200px;
+    height: 200px;
+    border: 2px dashed #333;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column; 
+    align-items: center;     
+    justify-content: center;  
+    color: #333;
+    font-size: 16px;
+    margin: 20px;
+}
 
     .hidden {
         display: none;
@@ -78,7 +79,12 @@
 <body>
   <div class="drop-zone" id="dropZone">
     <font class="lang">Click for upload structure file</font>
-</div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <font class="lang">version: 1.20.? ~ 1.21(preview)</font>
+  </div>
 
 <input type="file" class="hidden" id="fileInput" onchange="handleFiles(this.files)">
 
@@ -303,7 +309,7 @@
 
       const texts = new Map([
           ["nit", "再捏"],
-          ["Click for upload structure file", "点击上传结构文件"],
+          ["Click for upload structure file", "点击上传结构文件，不兼容部分较新版本的方块"],
           ["coordinate offset x*y*z", "坐标偏移 <x y z>"],
           ["nameTag", "实体渲染所需的名称"],
           ["Click for run", "点击开始制作"],
@@ -312,8 +318,10 @@
       ])
       if(navigator.language.toLowerCase()==='zh-CN'.toLowerCase() || navigator.language.toLowerCase()==='zh-TW'.toLowerCase()){
         console.log('lang is zh-CN')
+        document.title = '从结构文件制作投影'
+
         const 获取全部font元素 = document.getElementsByTagName("font");
-          console.log(获取全部font元素);
+          // console.log(获取全部font元素);
           // 遍历
           for (let i = 0; i < 获取全部font元素.length; i++) {
               const element = 获取全部font元素[i];

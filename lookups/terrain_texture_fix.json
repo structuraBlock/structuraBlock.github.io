@@ -1,0 +1,11 @@
+{
+
+    "texture_data": {
+
+      "grass_side": {
+        "textures": [
+            "textures/blocks/grass_side_carried"
+        ]
+    }
+}
+}

@@ -3,6 +3,7 @@ name = "Holy Surf"
 packages = [ ]
 
 [files]
+"ads.txt" = "./ads.txt"
 "animation_class.py" = "./animation_class.py"
 "APItest.py" = "./APItest.py"
 "armor_stand_class.py" = "./armor_stand_class.py"
@@ -16,6 +17,7 @@ packages = [ ]
 "speed_test.py" = "./speed_test.py"
 "structura_core.py" = "./structura_core.py"
 "structure_reader.py" = "./structure_reader.py"
+"temp.py" = "./temp.py"
 "upTest.py" = "./upTest.py"
 "libZip/lookups.zip" = "./libZip/lookups.zip"
 "libZip/test_structures.zip" = "./libZip/test_structures.zip"
