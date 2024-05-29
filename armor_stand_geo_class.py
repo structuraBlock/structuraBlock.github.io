@@ -375,14 +375,13 @@ class armorstandgeo:
             
             for side in corrected_textures.keys():
                 if len(corrected_textures[side])>index:
-                    print("corrected_textures[side][index]",corrected_textures[side][index])
                     if corrected_textures[side][index] != "default":
                         texture_files[side] = corrected_textures[side][index] 
                         if debug:
                             print("{}: {}".format(side,texture_files[side]))
             for key in texture_files.keys():
-                print("key ",key)
-                print("texture_files[key] ",texture_files[key])
+                # print("key ",key)
+                # print("texture_files[key] ",texture_files[key])
                 if type(key) is dict:  # textures/blocks/waterlily
                     texture_files[key] = texture_files[key]["path"]
                 # so why the so many data stru in terrain_texture.json
@@ -390,6 +389,7 @@ class armorstandgeo:
                 # textures : [str]
                 # textures : [ {path:str}] 
                 # textures : {path:str}
+                # textures : [{path:str},str]
                 if texture_files[key] not in self.uv_map.keys():
                     tgaPath = "{}/{}.tga".format(self.ref_resource_pack, texture_files[key])
                     pngPath = "{}/{}.png".format(self.ref_resource_pack, texture_files[key])
@@ -415,6 +415,7 @@ class armorstandgeo:
         texturedata = self.terrain_texture["texture_data"]
         textures = {}
 
+        # print("textureLayout",textureLayout,type(textureLayout))
         if type(textureLayout) is dict:
             if "side" in textureLayout.keys():
                 textures["east"] = textureLayout["side"]
@@ -442,9 +443,12 @@ class armorstandgeo:
             textures["down"] = textureLayout
         for key in textures.keys():
             texturedata_key_textures = texturedata[textures[key]]["carried_textures"] if "carried_textures" in texturedata[textures[key]] else texturedata[textures[key]]["textures"]
-            if type(texturedata_key_textures) is str:
+            print("texturedata_key_textures@",texturedata_key_textures,texturedata[textures[key]])
+            if type(texturedata_key_textures) is str: # grass_carried_top : textures : str
                 textures[key] = texturedata_key_textures
-            elif type(texturedata_key_textures) is list:
+                print("texturedata_key_textures#",texturedata_key_textures,textures[key])
+
+            elif type(texturedata_key_textures) is list: # grass_bottom : textures : [str]
                 index=0
                 if variant[0] in self.block_properties.keys():
                     index=self.block_properties[variant[0]].index(variant[1])
@@ -455,6 +459,10 @@ class armorstandgeo:
                     print(texturedata_key_textures)
                     print(texturedata_key_textures[index])
                 textures[key] = texturedata_key_textures[index]
+                print("texturedata_key_textures$",texturedata_key_textures,textures[key])
+            elif type(texturedata_key_textures) is dict:
+                textures[key] = texturedata_key_textures["path"] # grass_carried : {textures:{path:str}}
 
-            
+
+        print("textures",textures)
         return textures

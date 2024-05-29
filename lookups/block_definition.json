@@ -1017,5 +1017,6 @@
     "dead_bubble_coral_fan":"cube",
     "dead_fire_coral_fan":"cube",
     "dead_horn_coral_fan":"cube",
-    "dead_tube_coral_fan":"cube"
+    "dead_tube_coral_fan":"cube",
+    "vault":"cube"
 }
