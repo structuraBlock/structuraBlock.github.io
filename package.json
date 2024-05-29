@@ -1,7 +1,8 @@
 {
   "scripts": {
     "build": "node list.js",
-    "server": "node index.js"
+    "server": "node index.js",
+    "serve": "node index.js"
   },
   "dependencies": {
     "archiver": "^7.0.1",
