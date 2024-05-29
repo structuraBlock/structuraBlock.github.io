@@ -410,7 +410,7 @@ class armorstandgeo:
 
     def get_block_texture_paths(self, blockName, variant = ""):
         # helper function for getting the texture locations from the vanilla files.
-        print(blockName)
+        print("blockName",blockName)
         textureLayout = self.blocks_def[blockName]["carried_textures"] if "carried_textures" in self.blocks_def[blockName] else self.blocks_def[blockName]["textures"]
         texturedata = self.terrain_texture["texture_data"]
         textures = {}
@@ -443,10 +443,10 @@ class armorstandgeo:
             textures["down"] = textureLayout
         for key in textures.keys():
             texturedata_key_textures = texturedata[textures[key]]["carried_textures"] if "carried_textures" in texturedata[textures[key]] else texturedata[textures[key]]["textures"]
-            print("texturedata_key_textures@",texturedata_key_textures,texturedata[textures[key]])
+            # print("texturedata_key_textures@",texturedata_key_textures,texturedata[textures[key]])
             if type(texturedata_key_textures) is str: # grass_carried_top : textures : str
                 textures[key] = texturedata_key_textures
-                print("texturedata_key_textures#",texturedata_key_textures,textures[key])
+                # print("texturedata_key_textures#",texturedata_key_textures,textures[key])
 
             elif type(texturedata_key_textures) is list: # grass_bottom : textures : [str]
                 index=0
@@ -459,10 +459,10 @@ class armorstandgeo:
                     print(texturedata_key_textures)
                     print(texturedata_key_textures[index])
                 textures[key] = texturedata_key_textures[index]
-                print("texturedata_key_textures$",texturedata_key_textures,textures[key])
+                # print("texturedata_key_textures$",texturedata_key_textures,textures[key])
             elif type(texturedata_key_textures) is dict:
                 textures[key] = texturedata_key_textures["path"] # grass_carried : {textures:{path:str}}
 
 
-        print("textures",textures)
+        # print("textures",textures)
         return textures
