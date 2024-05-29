@@ -30,8 +30,9 @@ import time
 import png
 from numpy import array, empty, uint8, zeros
 
-debug=False
+from python_modules.tga2png import tga2png
 
+debug=False
 class armorstandgeo:
     def __init__(self, name, alpha = 0.8,offsets=[0,0,0], size=[64, 64, 64], ref_pack="Vanilla_Resource_Pack"):
         self.ref_resource_pack = ref_pack
@@ -42,13 +43,30 @@ class armorstandgeo:
         with open("lookups/blocks_fix.json") as f:
             ## fix by wanasleep
             self.blocks_def.update(json.load(f))
+        with open("{}/chemistry_blocks.json".format(self.ref_resource_pack)) as f:
+            ## fix by wanasleep
+            self.blocks_def.update(json.load(f))
+
         with open("{}/textures/terrain_texture.json".format(self.ref_resource_pack)) as f:
             ##maps textures names to texture files.
             self.terrain_texture = json.load(f)
         with open("lookups/terrain_texture_fix.json") as f:
             ## fix
-            # json.load(f).update(self.terrain_texture)
             self.terrain_texture["texture_data"].update(json.load(f)["texture_data"])
+        with open("{}/textures/chemistry_terrain_texture.json".format(self.ref_resource_pack)) as f:
+            ## fix
+            self.terrain_texture["texture_data"].update(json.load(f)["texture_data"])
+
+
+        with open("lookups/mojang-blocks.json") as f:
+            ## no variants.json,try try mojang-blocks by meta-data
+            mojang_blocks = json.load(f)
+            self.block_properties = {}
+            for key in mojang_blocks["block_properties"]:
+                # if  key["type"]  !="string":continue
+        
+                self.block_properties[key["name"]] = [v["value"] for v in key["values"]]
+
         with open("lookups/block_rotation.json") as f:
             ## custom look up table i wrote to help with rotations, error messages dump if somehting has undefined rotations 
             self.block_rotations = json.load(f)
@@ -78,6 +96,7 @@ class armorstandgeo:
         self.layers=[]
         self.uv_array = None
         self.pre_gen_blocks={}
+        self.iiii = 0
         ## The stuff below is a horrible cludge that should get cleaned up. +1 karma to whomever has a better plan for this.
         # this is how i determine if something should be thin. it is ugly, but kinda works
 
@@ -187,6 +206,9 @@ class armorstandgeo:
 
     def make_block(self, x, y, z, block_name, rot=None, top=False,data=0, trap_open=False, parent=None,variant="default", big = False):
         # make_block handles all the block processing, This function does need cleanup and probably should be broken into other helperfunctions for ledgiblity.
+        if block_name not in self.defs:
+            print("block_name not in self.defs => "+block_name)
+            return
         block_type = self.defs[block_name]
         if block_type!="ignore":
             ghost_block_name = "block_{}_{}_{}".format(x, y, z)
@@ -226,6 +248,7 @@ class armorstandgeo:
             if str(data) in self.block_shapes[block_type].keys():
                 block_shapes = self.block_shapes[block_type][str(data)]
             if block_type in self.block_rotations.keys() and rot is not None:
+                print(ghost_block_name,block_type,rot)
                 self.blocks[ghost_block_name]["rotation"] = copy.deepcopy(self.block_rotations[block_type][str(rot)])
                 if big:
                     self.blocks[ghost_block_name]["rotation"][1]+=180
@@ -333,7 +356,7 @@ class armorstandgeo:
             self.uv_array = temp_new
 
     def block_name_to_uv(self, block_name, variant = "",shape_variant="default",index=0,data=0):
-        
+        self.iiii += 1
         # helper function maps the the section of the uv file to the side of the block
         temp_uv = {}
         if block_name not in self.excluded:  # if you dont want a block to be rendered, exclude the UV
@@ -353,16 +376,30 @@ class armorstandgeo:
             for side in corrected_textures.keys():
                 if len(corrected_textures[side])>index:
                     if corrected_textures[side][index] != "default":
-                        texture_files[side]=corrected_textures[side][index]
+                        texture_files[side] = corrected_textures[side][index] 
                         if debug:
                             print("{}: {}".format(side,texture_files[side]))
             for key in texture_files.keys():
+                # print("key ",key)
+                # print("texture_files[key] ",texture_files[key])
+                if type(key) is dict:  # textures/blocks/waterlily
+                    texture_files[key] = texture_files[key]["path"]
+                # so why the so many data stru in terrain_texture.json
+                # textures : str
+                # textures : [str]
+                # textures : [ {path:str}] 
+                # textures : {path:str}
+                # textures : [{path:str},str]
                 if texture_files[key] not in self.uv_map.keys():
-                    self.extend_uv_image(
-                        "{}/{}.png".format(self.ref_resource_pack, texture_files[key]))
+                    tgaPath = "{}/{}.tga".format(self.ref_resource_pack, texture_files[key])
+                    pngPath = "{}/{}.png".format(self.ref_resource_pack, texture_files[key])
+                    if not os.path.exists(pngPath) and os.path.exists(tgaPath):
+                        tga2png(tgaPath,pngPath)
+
+                    # print(pngPath,self.ref_resource_pack, texture_files[key],key,block_name,texture_files)
+                    self.extend_uv_image(pngPath)
                     self.uv_map[texture_files[key]] = len(self.uv_map.keys())
-                temp_uv[key] = {
-                    "uv": [0, self.uv_map[texture_files[key]]], "uv_size": [1, 1]}
+                temp_uv[key] = {"uv": [0,self.uv_map[texture_files[key]]], "uv_size": [1, 1]}
 
         return temp_uv
 
@@ -373,10 +410,12 @@ class armorstandgeo:
 
     def get_block_texture_paths(self, blockName, variant = ""):
         # helper function for getting the texture locations from the vanilla files.
-        textureLayout = self.blocks_def[blockName]["textures"]
+        print("blockName",blockName)
+        textureLayout = self.blocks_def[blockName]["carried_textures"] if "carried_textures" in self.blocks_def[blockName] else self.blocks_def[blockName]["textures"]
         texturedata = self.terrain_texture["texture_data"]
         textures = {}
 
+        # print("textureLayout",textureLayout,type(textureLayout))
         if type(textureLayout) is dict:
             if "side" in textureLayout.keys():
                 textures["east"] = textureLayout["side"]
@@ -403,19 +442,27 @@ class armorstandgeo:
             textures["up"] = textureLayout
             textures["down"] = textureLayout
         for key in textures.keys():
-            
-            if type(texturedata[textures[key]]["textures"]) is str:
-                textures[key] = texturedata[textures[key]]["textures"]
-            elif type(texturedata[textures[key]]["textures"]) is list:
-                index=0
-                if variant[0] in self.block_variants.keys():
-                    index=self.block_variants[variant[0]][variant[1] ]
-                if debug:
-                    print(index)
-                    print(key)
-                    print(texturedata[textures[key]]["textures"])
-                    print(texturedata[textures[key]]["textures"][index])
-                textures[key] = texturedata[textures[key]]["textures"][index]
+            texturedata_key_textures = texturedata[textures[key]]["carried_textures"] if "carried_textures" in texturedata[textures[key]] else texturedata[textures[key]]["textures"]
+            # print("texturedata_key_textures@",texturedata_key_textures,texturedata[textures[key]])
+            if type(texturedata_key_textures) is str: # grass_carried_top : textures : str
+                textures[key] = texturedata_key_textures
+                # print("texturedata_key_textures#",texturedata_key_textures,textures[key])
 
-            
+            elif type(texturedata_key_textures) is list: # grass_bottom : textures : [str]
+                index=0
+                if variant[0] in self.block_properties.keys():
+                    index=self.block_properties[variant[0]].index(variant[1])
+                if debug:
+                    print(">> blockName",blockName,variant)
+                    print(">> index",index)
+                    print(">> key",key,textures[key])
+                    print(texturedata_key_textures)
+                    print(texturedata_key_textures[index])
+                textures[key] = texturedata_key_textures[index]
+                # print("texturedata_key_textures$",texturedata_key_textures,textures[key])
+            elif type(texturedata_key_textures) is dict:
+                textures[key] = texturedata_key_textures["path"] # grass_carried : {textures:{path:str}}
+
+
+        # print("textures",textures)
         return textures
