@@ -18,6 +18,7 @@ packages = [ ]
 "structura_core.py" = "./structura_core.py"
 "structure_reader.py" = "./structure_reader.py"
 "temp.py" = "./temp.py"
+"test.py" = "./test.py"
 "upTest.py" = "./upTest.py"
 "libZip/lookups.zip" = "./libZip/lookups.zip"
 "libZip/test_structures.zip" = "./libZip/test_structures.zip"

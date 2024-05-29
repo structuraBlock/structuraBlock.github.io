@@ -147,5 +147,8 @@
     },
     "trip_wire": {
         "textures": "trip_wire"
+    },
+    "client_request_placeholder_block":{
+        "textures": "trip_wire"
     }
 }
