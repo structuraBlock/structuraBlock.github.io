@@ -33,7 +33,6 @@ from numpy import array, empty, uint8, zeros
 from python_modules.tga2png import tga2png
 
 debug=False
-type_class_dict = type({})
 class armorstandgeo:
     def __init__(self, name, alpha = 0.8,offsets=[0,0,0], size=[64, 64, 64], ref_pack="Vanilla_Resource_Pack"):
         self.ref_resource_pack = ref_pack
@@ -378,16 +377,19 @@ class armorstandgeo:
                 if len(corrected_textures[side])>index:
                     print("corrected_textures[side][index]",corrected_textures[side][index])
                     if corrected_textures[side][index] != "default":
-                        print(type(corrected_textures[side][index]) != type_class_dict,type(corrected_textures[side][index]),type_class_dict)
-                        if type(corrected_textures[side][index]) != type_class_dict:
-                            texture_files[side] = corrected_textures[side][index]  
-                        else:
-                             print("corrected_textures",corrected_textures)
-                             texture_files[side] = corrected_textures[side][index]["path"] # textures/blocks/waterlily
+                        texture_files[side] = corrected_textures[side][index] 
                         if debug:
                             print("{}: {}".format(side,texture_files[side]))
             for key in texture_files.keys():
-                # print(key,type(texture_files[key]),type(texture_files[key])==type_class_dict)
+                print("key ",key)
+                print("texture_files[key] ",texture_files[key])
+                if type(key) is dict:  # textures/blocks/waterlily
+                    texture_files[key] = texture_files[key]["path"]
+                # so why the so many data stru in terrain_texture.json
+                # textures : str
+                # textures : [str]
+                # textures : [ {path:str}] 
+                # textures : {path:str}
                 if texture_files[key] not in self.uv_map.keys():
                     tgaPath = "{}/{}.tga".format(self.ref_resource_pack, texture_files[key])
                     pngPath = "{}/{}.png".format(self.ref_resource_pack, texture_files[key])
@@ -439,7 +441,7 @@ class armorstandgeo:
             textures["up"] = textureLayout
             textures["down"] = textureLayout
         for key in textures.keys():
-            texturedata_key_textures = texturedata[textures[key]]["textures"] if "textures" in texturedata[textures[key]] else texturedata[textures[key]]["carried_textures"]
+            texturedata_key_textures = texturedata[textures[key]]["carried_textures"] if "carried_textures" in texturedata[textures[key]] else texturedata[textures[key]]["textures"]
             if type(texturedata_key_textures) is str:
                 textures[key] = texturedata_key_textures
             elif type(texturedata_key_textures) is list:
