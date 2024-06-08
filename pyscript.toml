@@ -13,6 +13,7 @@ packages = [ ]
 "manifest.py" = "./manifest.py"
 "merge_terrain_texture.py" = "./merge_terrain_texture.py"
 "pack_icon.ico" = "./pack_icon.ico"
+"pack_icon.png" = "./pack_icon.png"
 "render_controller_class.py" = "./render_controller_class.py"
 "speed_test.py" = "./speed_test.py"
 "structura_core.py" = "./structura_core.py"

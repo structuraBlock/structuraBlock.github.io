@@ -410,7 +410,7 @@ class armorstandgeo:
 
     def get_block_texture_paths(self, blockName, variant = ""):
         # helper function for getting the texture locations from the vanilla files.
-        print("blockName",blockName)
+        # print("blockName",blockName)
         textureLayout = self.blocks_def[blockName]["carried_textures"] if "carried_textures" in self.blocks_def[blockName] else self.blocks_def[blockName]["textures"]
         texturedata = self.terrain_texture["texture_data"]
         textures = {}
