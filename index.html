@@ -29,6 +29,18 @@
     }
 </style>
   <script type="text/javascript">
+
+    // 新增一个页面加载耗时计时器
+    var startTime = new Date();
+    document.addEventListener('DOMContentLoaded', function() {
+      var endTime = new Date();
+      var duration = endTime - startTime;
+      console.log('页面加载耗时：' + duration + '毫秒');
+      console.log('startTime ' + startTime.getTime());
+      console.log('endTime ' + endTime);
+    });
+ 
+
     function downloadFile() {
       const now = new Date();
    
@@ -72,9 +84,8 @@
 
 
 </head>
-
-<font class="lang"></font>
 <body>
+    
   <div class="drop-zone" id="dropZone">
     <font class="lang">Click for upload structure file</font>
     <br>
@@ -83,6 +94,19 @@
     <br>
     <font class="lang">version: 1.20.? ~ 1.21(preview)</font>
   </div>
+
+<div id="startTime" style="visibility: hidden;" >0</div>
+<script>
+      // 新增一个页面加载耗时计时器
+      var startTime = new Date();
+
+      document.addEventListener('DOMContentLoaded', function() {
+        var endTime = new Date();
+        var duration = endTime - startTime;
+        document.getElementById('startTime').innerHTML = startTime.getTime();
+      });
+
+</script>
 
 <input type="file" class="hidden" id="fileInput" onchange="handleFiles(this.files)">
 
@@ -117,7 +141,7 @@
 
   <img id="pyLoading" width="35%" height="auto" style="padding-right:70% ;padding-top: 10%;padding-bottom: 70%;background-color:antiquewhite;z-index: 999;position: absolute;top:0px;image-rendering:pixelated;display:block;" src="data:image/gif;base64,R0lGODlhAgACAPEAAAAAAD1ucDI+TwAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJHgAAACwAAAAAAgACAAECAgxeACH5BAkeAAAALAAAAAACAAIAAQIDVAAFACH5BAkeAAAALAAAAAACAAIAAQIDlBAFACH5BAgeAAAALAAAAAACAAIAAQIDlCIFACH5BAgeAAAALAAAAAACAAIAAQICjF4AIfkECR4AAAAsAAAAAAIAAgABAgMMJAUAIfkECR4AAAAsAAAAAAIAAgABAgMMBAUAOw==">
  
-  
+
 
     <script type="py" config="./pyscript.toml" terminal></script>
  
@@ -211,6 +235,14 @@
 
       document.getElementById("pyLoading").style.display = "none"
       document.getElementById("resourceLoading").style.display = "none"
+
+      import time
+      # print("time.time()*1000",int(time.time()*1000) )
+      # print("document",  int(document.getElementById("startTime").innerHTML))
+      print("loading",int(time.time()*1000) - int(document.getElementById("startTime").innerHTML),"ms")
+      
+
+
 
     </py-script>
 
