@@ -128,6 +128,18 @@
   </ul>
 
   <font id="resourceLoading" style="z-index: 1999;top: 0%;position: absolute;display:block;">0%</font>
+  
+  <!-- 展示三个链接 -->
+
+  <div id="linkList" style="z-index: 1999;top: 15px;position: absolute;display:block;">
+    <font class="lang">other mirror site</font>
+    <a id="hongkong" href="hk.0-1.fun" target="_blank" style="display: block;"><font class="lang">China HongKong</font> </a>
+    <a id="cloudflare" href="cf.0-1.fun" target="_blank" style="display: block;"><font class="lang">cloudflare</font> </a>
+    <a id="cloudflare" href="0-1.fun" target="_blank" style="display: block;"><font class="lang">github pages</font> </a>
+
+  </div>
+
+  
   <script>
     const resourceLoading = setInterval(function () {
       document.getElementById("resourceLoading").innerText 
@@ -138,10 +150,8 @@
         clearInterval(resourceLoading)
     }, 100);
   </script>
-
   <img id="pyLoading" width="35%" height="auto" style="padding-right:70% ;padding-top: 10%;padding-bottom: 70%;background-color:antiquewhite;z-index: 999;position: absolute;top:0px;image-rendering:pixelated;display:block;" src="data:image/gif;base64,R0lGODlhAgACAPEAAAAAAD1ucDI+TwAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJHgAAACwAAAAAAgACAAECAgxeACH5BAkeAAAALAAAAAACAAIAAQIDVAAFACH5BAkeAAAALAAAAAACAAIAAQIDlBAFACH5BAgeAAAALAAAAAACAAIAAQIDlCIFACH5BAgeAAAALAAAAAACAAIAAQICjF4AIfkECR4AAAAsAAAAAAIAAgABAgMMJAUAIfkECR4AAAAsAAAAAAIAAgABAgMMBAUAOw==">
  
-
 
     <script type="py" config="./pyscript.toml" terminal></script>
  
@@ -345,6 +355,10 @@
           ["Click for run", "点击开始制作"],
           ["wait and wait", "等我！"],
           ["i am ready", "好啦！"],
+          ["China HongKong", "中国香港特别行政区"],
+          ["github pages", "github pages 服务"],
+          ["cloudflare", "cloudflare减速"],
+          ["other mirror site", "超过一分钟和三次加载失败时，请考虑使用以下站点"],
       ])
       if(navigator.language.toLowerCase()==='zh-CN'.toLowerCase() || navigator.language.toLowerCase()==='zh-TW'.toLowerCase()){
         console.log('lang is zh-CN')
