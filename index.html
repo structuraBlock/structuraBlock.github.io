@@ -142,8 +142,12 @@
   <script>
     const resourceLoading = setInterval(function () {
       document.getElementById("resourceLoading").innerText 
-      = (performance.getEntriesByType('resource').reduce((acc,cur)=>acc+cur.decodedBodySize,0) / 18174363 * 100).toFixed(2)+"%" 
-      +" ... " + performance.getEntriesByType('resource').length + "/" + 39;
+      = (performance.getEntriesByType('resource').reduce((acc,cur)=>acc+cur.decodedBodySize,0) / 18163014 * 100).toFixed(2)+"%" 
+      +" ... " + performance.getEntriesByType('resource').length + "/" + 42;
+
+      // console.log( performance.getEntriesByType('resource').reduce((acc,cur)=>acc+cur.decodedBodySize,0))
+      // console.log( performance.getEntriesByType('resource').length  )
+
 
       if(document.getElementById("resourceLoading").style.display==="none")
         clearInterval(resourceLoading)
