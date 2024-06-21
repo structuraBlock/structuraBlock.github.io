@@ -132,11 +132,10 @@
 
   <div id="linkList" style="z-index: 1999;top: 15px;position: absolute;display:block;">
     <font class="lang">other mirror site</font>
-    <!-- <a id="hongkong" href="http://hk.0-1.fun" target="_blank" style="display: block;"><font class="lang">China HongKong</font> </a> -->
-    <!-- <a id="cloudflare" href="0-1.fun" target="_blank" style="display: block;"><font class="lang">cloudflare</font> </a> -->
     <a id="github pages" href="http://structuraBlock.github.io" target="_blank" style="display: block;"><font class="lang">github pages</font> </a>
 
   </div>
+
 
   
   <script>
@@ -148,9 +147,10 @@
       // console.log( performance.getEntriesByType('resource').reduce((acc,cur)=>acc+cur.decodedBodySize,0))
       // console.log( performance.getEntriesByType('resource').length  )
 
-
-      if(document.getElementById("resourceLoading").style.display==="none")
-        clearInterval(resourceLoading)
+        if (performance.getEntriesByType('resource').length >= 42){
+          document.getElementById("resourceLoading").style.display="none"
+          clearInterval(resourceLoading)
+        }
     }, 100);
   </script>
   <img id="pyLoading" width="35%" height="auto" style="padding-right:70% ;padding-top: 10%;padding-bottom: 70%;background-color:antiquewhite;z-index: 999;position: absolute;top:0px;image-rendering:pixelated;display:block;" src="data:image/gif;base64,R0lGODlhAgACAPEAAAAAAD1ucDI+TwAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJHgAAACwAAAAAAgACAAECAgxeACH5BAkeAAAALAAAAAACAAIAAQIDVAAFACH5BAkeAAAALAAAAAACAAIAAQIDlBAFACH5BAgeAAAALAAAAAACAAIAAQIDlCIFACH5BAgeAAAALAAAAAACAAIAAQICjF4AIfkECR4AAAAsAAAAAAIAAgABAgMMJAUAIfkECR4AAAAsAAAAAAIAAgABAgMMBAUAOw==">
@@ -162,6 +162,15 @@
       import os
       import zipfile
       import js
+      
+      import time
+      from js import document
+
+      
+      loading_try_count = 1
+      while document.getElementById("resourceLoading").style.display != "none":
+        print("#"+i+" waiting for resource loading...")
+        time.sleep(0.31)
 
       current_dir = os.getcwd()
 
@@ -182,7 +191,7 @@
 
       
       from io import BytesIO
-      from js import document
+      # from js import document
       from pyodide.ffi.wrappers import add_event_listener
       
       from upTest import add,conver
@@ -248,9 +257,9 @@
 
       document.getElementById("pyLoading").style.display = "none"
       document.getElementById("linkList").style.display = "none"
-      document.getElementById("resourceLoading").style.display = "none"
 
-      import time
+      <!-- document.getElementById("resourceLoading").style.display = "none" -->
+
       # print("time.time()*1000",int(time.time()*1000) )
       # print("document",  int(document.getElementById("startTime").innerHTML))
       print("loading",int(time.time()*1000) - int(document.getElementById("startTime").innerHTML),"ms")
